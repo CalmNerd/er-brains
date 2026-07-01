@@ -21,6 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { PriorityIndicator } from "@/components/task-list/priority-indicator"
+import { TaskStatusIcon } from "@/components/task-list/task-status-icon"
 import { formatTaskId } from "@/lib/tasks/utils"
 import { TASK_PRIORITIES, TASK_STATUSES, type Task } from "@/lib/tasks/types"
 
@@ -96,7 +98,10 @@ export function TaskDetailDialog({
                   <SelectGroup>
                     {TASK_PRIORITIES.map((p) => (
                       <SelectItem key={p} value={p}>
-                        {p}
+                        <span className="flex items-center gap-2">
+                          <PriorityIndicator priority={p} className="size-3.5" />
+                          {p}
+                        </span>
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -112,9 +117,12 @@ export function TaskDetailDialog({
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                    {TASK_STATUSES.map((s) => (
+                  {TASK_STATUSES.map((s) => (
                     <SelectItem key={s} value={s}>
-                      {s}
+                      <span className="flex items-center gap-2">
+                        <TaskStatusIcon status={s} />
+                        {s}
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectGroup>

@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 /** Runtime + compile-time source of truth for task shapes. */
-export const taskPrioritySchema = z.enum(["Low", "Medium", "High"])
+export const taskPrioritySchema = z.enum(["Urgent", "High", "Medium", "Low"])
 export const taskStatusSchema = z.enum(["To Do", "In Progress", "Done"])
 
 export const taskSchema = z.object({

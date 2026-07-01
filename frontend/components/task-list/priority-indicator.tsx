@@ -1,10 +1,6 @@
 import { HugeiconsIcon } from "@hugeicons/react"
-import {
-  Alert02Icon,
-  MoreHorizontalIcon,
-  SignalFull02Icon,
-} from "@hugeicons/core-free-icons"
 
+import { PRIORITY_ICON_CONFIG } from "@/lib/tasks/icon-config"
 import type { TaskPriority } from "@/lib/tasks/types"
 import { cn } from "@/lib/utils"
 
@@ -13,29 +9,8 @@ type PriorityIndicatorProps = {
   className?: string
 }
 
-const PRIORITY_CONFIG: Record<
-  TaskPriority,
-  { icon: typeof Alert02Icon; className: string; label: string }
-> = {
-  High: {
-    icon: Alert02Icon,
-    className: "text-orange-500",
-    label: "High priority",
-  },
-  Medium: {
-    icon: SignalFull02Icon,
-    className: "text-muted-foreground",
-    label: "Medium priority",
-  },
-  Low: {
-    icon: MoreHorizontalIcon,
-    className: "text-muted-foreground/60",
-    label: "Low priority",
-  },
-}
-
 export function PriorityIndicator({ priority, className }: PriorityIndicatorProps) {
-  const config = PRIORITY_CONFIG[priority]
+  const config = PRIORITY_ICON_CONFIG[priority]
 
   return (
     <span

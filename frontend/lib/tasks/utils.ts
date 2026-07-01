@@ -4,9 +4,10 @@ import { isSameTaskId, isTaskStatus } from "@/lib/tasks/schema"
 import type { Task, TaskId, TaskPriority, TaskStatus } from "@/lib/tasks/types"
 
 const PRIORITY_RANK: Record<TaskPriority, number> = {
-  High: 0,
-  Medium: 1,
-  Low: 2,
+  Urgent: 0,
+  High: 1,
+  Medium: 2,
+  Low: 3,
 }
 
 const STATUS_RANK: Record<TaskStatus, number> = {

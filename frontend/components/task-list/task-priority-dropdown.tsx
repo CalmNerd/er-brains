@@ -1,12 +1,7 @@
 "use client"
 
 import { HugeiconsIcon } from "@hugeicons/react"
-import {
-  Alert02Icon,
-  MoreHorizontalIcon,
-  SignalFull02Icon,
-  Tick02Icon,
-} from "@hugeicons/core-free-icons"
+import { Tick02Icon } from "@hugeicons/core-free-icons"
 
 import { PriorityIndicator } from "@/components/task-list/priority-indicator"
 import {
@@ -16,18 +11,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { TASK_PRIORITIES, type TaskPriority } from "@/lib/tasks/types"
-import { cn } from "@/lib/utils"
 
 type TaskPriorityDropdownProps = {
   priority: TaskPriority
   onPriorityChange: (priority: TaskPriority) => void
 }
-
-const PRIORITY_ICONS = {
-  High: Alert02Icon,
-  Medium: SignalFull02Icon,
-  Low: MoreHorizontalIcon,
-} as const
 
 /** Stops drag activation when opening the priority menu. */
 function stopDragPointerDown(event: React.PointerEvent) {
@@ -54,14 +42,7 @@ export function TaskPriorityDropdown({
             onClick={() => onPriorityChange(option)}
             className="gap-2"
           >
-            <HugeiconsIcon
-              icon={PRIORITY_ICONS[option]}
-              strokeWidth={2}
-              className={cn(
-                "size-3.5",
-                option === "High" ? "text-orange-500" : "text-muted-foreground"
-              )}
-            />
+            <PriorityIndicator priority={option} className="size-3.5" />
             <span className="flex-1">{option}</span>
             {priority === option ? (
               <HugeiconsIcon icon={Tick02Icon} strokeWidth={2} className="size-3.5" />

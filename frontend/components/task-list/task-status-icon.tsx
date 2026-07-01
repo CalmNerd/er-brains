@@ -1,10 +1,6 @@
 import { HugeiconsIcon } from "@hugeicons/react"
-import {
-  CheckmarkCircle01Icon,
-  CircleIcon,
-  Loading03Icon,
-} from "@hugeicons/core-free-icons"
 
+import { STATUS_ICON_CONFIG } from "@/lib/tasks/icon-config"
 import type { TaskStatus } from "@/lib/tasks/types"
 import { cn } from "@/lib/utils"
 
@@ -13,24 +9,14 @@ type TaskStatusIconProps = {
   className?: string
 }
 
-const STATUS_ICONS = {
-  "To Do": CircleIcon,
-  "In Progress": Loading03Icon,
-  Done: CheckmarkCircle01Icon,
-} as const
-
-const STATUS_ICON_CLASS: Record<TaskStatus, string> = {
-  "To Do": "text-muted-foreground",
-  "In Progress": "text-amber-500",
-  Done: "text-blue-500",
-}
-
 export function TaskStatusIcon({ status, className }: TaskStatusIconProps) {
+  const config = STATUS_ICON_CONFIG[status]
+
   return (
     <HugeiconsIcon
-      icon={STATUS_ICONS[status]}
+      icon={config.icon}
       strokeWidth={2}
-      className={cn("size-3.5 shrink-0", STATUS_ICON_CLASS[status], className)}
+      className={cn("size-3.5 shrink-0", config.className, className)}
     />
   )
 }

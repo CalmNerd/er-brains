@@ -28,7 +28,7 @@
     "title": "Build task list component",
     "description": "Linear-style grouped list with drag-and-drop between status sections.",
     "dueDate": "2026-03-01",
-    "priority": "High",
+    "priority": "Urgent",
     "status": "In Progress"
   },
   {
@@ -44,7 +44,7 @@
     "title": "Connect to backend API",
     "description": "Replace dummy data with REST endpoints for CRUD operations on tasks.",
     "dueDate": "2026-03-20",
-    "priority": "High",
+    "priority": "Urgent",
     "status": "To Do"
   },
   {
