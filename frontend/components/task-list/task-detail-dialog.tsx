@@ -24,16 +24,27 @@ import {
 import { formatTaskId } from "@/lib/tasks/utils"
 import { TASK_PRIORITIES, TASK_STATUSES, type Task } from "@/lib/tasks/types"
 
+import { cn } from "@/lib/utils"
+
 type TaskDetailDialogProps = {
   task: Task
+  triggerVariant?: "list" | "board"
 }
+
+const TRIGGER_STYLES = {
+  list: "min-w-0 flex-1 truncate text-left text-sm text-foreground hover:underline",
+  board: "min-w-0 flex-1 line-clamp-1 text-left text-sm font-medium text-foreground hover:text-primary",
+} as const
 
 /** Prevents the row drag handler from starting when opening task details. */
 function stopDragPointerDown(event: React.PointerEvent) {
   event.stopPropagation()
 }
 
-export function TaskDetailDialog({ task }: TaskDetailDialogProps) {
+export function TaskDetailDialog({
+  task,
+  triggerVariant = "list",
+}: TaskDetailDialogProps) {
   return (
     <Dialog>
       <DialogTrigger
@@ -41,7 +52,7 @@ export function TaskDetailDialog({ task }: TaskDetailDialogProps) {
           <button
             type="button"
             onPointerDown={stopDragPointerDown}
-            className="min-w-0 flex-1 truncate text-left text-sm text-foreground hover:underline"
+            className={cn(TRIGGER_STYLES[triggerVariant])}
           />
         }
       >
