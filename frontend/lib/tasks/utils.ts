@@ -76,9 +76,15 @@ export function flattenTasksByStatus<TTask extends Task = Task>(
   return STATUS_ORDER.flatMap((status) => grouped[status])
 }
 
-/** Formats an ISO date string for compact list display (e.g. "Dec 2025"). */
+/** Formats an ISO date string for compact list display (e.g. "12 Mar" or "Feb 2027"). */
 export function formatDueDate(isoDate: string): string {
   const date = new Date(isoDate)
+  const currentYear = new Date().getFullYear()
+
+  if (date.getFullYear() === currentYear) {
+    return date.toLocaleDateString("en-GB", { day: "numeric", month: "short" })
+  }
+
   return date.toLocaleDateString("en-US", { month: "short", year: "numeric" })
 }
 
