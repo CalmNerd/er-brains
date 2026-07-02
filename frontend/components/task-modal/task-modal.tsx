@@ -1,6 +1,6 @@
 "use client"
 
-import * as React from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { HugeiconsIcon } from "@hugeicons/react"
 import {
   ArrowRight01Icon,
@@ -52,14 +52,14 @@ function CreateMoreToggle({
       aria-label="Create more tasks"
       onClick={() => onCheckedChange(!checked)}
       className={cn(
-        "relative inline-flex h-5 w-9 shrink-0 rounded-full border border-transparent transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "relative inline-flex h-4 w-7 shrink-0 rounded-full border border-transparent transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring",
         checked ? "bg-primary" : "bg-muted"
       )}
     >
       <span
         className={cn(
-          "pointer-events-none absolute top-1/2 left-0.5 block size-4 rounded-full bg-background shadow-sm transition-transform -translate-y-1/2",
-          checked && "translate-x-4"
+          "pointer-events-none absolute top-1/2 left-0.5 block size-3 rounded-full bg-background shadow-sm transition-transform -translate-y-1/2",
+          checked && "translate-x-3"
         )}
       />
     </button>
@@ -77,20 +77,27 @@ export function TaskModal({
   onUpdate,
   onDelete,
 }: TaskModalProps) {
-  const [values, setValues] = React.useState<TaskFormValues>(initialValues)
-  const [createMore, setCreateMore] = React.useState(false)
+  const [values, setValues] = useState<TaskFormValues>(initialValues)
+  const [createMore, setCreateMore] = useState(false)
   const [createDefaults, setCreateDefaults] =
-    React.useState<TaskFormValues>(initialValues)
+    useState<TaskFormValues>(initialValues)
+  const wasOpenRef = useRef(false)
 
-  React.useEffect(() => {
-    if (!open) return
+  useEffect(() => {
+    if (!open) {
+      wasOpenRef.current = false
+      return
+    }
 
-    setValues(initialValues)
-    setCreateDefaults(initialValues)
-    setCreateMore(false)
+    if (!wasOpenRef.current) {
+      wasOpenRef.current = true
+      setValues(initialValues)
+      setCreateDefaults(initialValues)
+      setCreateMore(false)
+    }
   }, [initialValues, open])
 
-  const updateField = React.useCallback(
+  const updateField = useCallback(
     <K extends keyof TaskFormValues>(key: K, value: TaskFormValues[K]) => {
       setValues((current) => ({ ...current, [key]: value }))
     },
@@ -99,7 +106,7 @@ export function TaskModal({
 
   const canSubmit = canSubmitTaskForm(mode, values, initialValues)
 
-  const handleSubmit = React.useCallback(() => {
+  const handleSubmit = useCallback(() => {
     if (!canSubmit) return
 
     if (mode === "create") {
@@ -130,7 +137,7 @@ export function TaskModal({
     values,
   ])
 
-  const handleDelete = React.useCallback(() => {
+  const handleDelete = useCallback(() => {
     if (!taskId || !onDelete) return
 
     onDelete(taskId)

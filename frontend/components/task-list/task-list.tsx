@@ -201,18 +201,11 @@ export function TaskList() {
     async (values: TaskFormValues, createMore: boolean) => {
       await createTask(formValuesToCreateInput(values))
 
-      if (createMore) {
-        setModalState({
-          open: true,
-          mode: "create",
-          initialValues: buildTaskFormValues(TOOLBAR_CREATE_DEFAULTS),
-        })
-        return
+      if (!createMore) {
+        closeModal()
       }
-
-      closeModal()
     },
-    [closeModal, createTask, setModalState]
+    [closeModal, createTask]
   )
 
   const handleUpdateTask = React.useCallback(
