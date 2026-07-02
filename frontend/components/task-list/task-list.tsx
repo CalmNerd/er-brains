@@ -96,13 +96,14 @@ export function TaskList() {
   const setModalState = useTaskUiStore((state) => state.setModalState)
   const closeModal = useTaskUiStore((state) => state.closeModal)
 
-  const { selectedTeamId, teams } = useTeamNav()
+  const { selectedTeamId, teams, isLoading: isTeamsLoading, isResolvingTeam } =
+    useTeamNav()
   const activeTeamName =
     teams.find((team) => team.id === selectedTeamId)?.name ?? "Team"
 
   const {
     tasks,
-    isLoading,
+    isLoading: isTasksLoading,
     isError,
     error,
     refetch,
@@ -110,6 +111,9 @@ export function TaskList() {
     updateTask,
     deleteTask,
   } = useTasks()
+
+  const isLoading = isTeamsLoading || isResolvingTeam || isTasksLoading
+  const hasNoTeams = !isTeamsLoading && teams.length === 0
 
   const handleSilentUpdate = React.useCallback(
     (taskId: TaskId, updates: Parameters<typeof updateTask>[1]) => {
@@ -227,7 +231,7 @@ export function TaskList() {
     [closeModal, deleteTask]
   )
 
-  if (selectedTeamId === null) {
+  if (hasNoTeams) {
     return (
       <div className="flex w-full flex-col px-4 lg:px-6">
         <TaskListEmpty onCreateTask={() => openCreateModal(TOOLBAR_CREATE_DEFAULTS)} />

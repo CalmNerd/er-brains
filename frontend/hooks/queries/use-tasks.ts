@@ -186,7 +186,10 @@ export function useTasks() {
 
   return {
     tasks: query.data ?? [],
-    isLoading: query.isLoading,
+    isLoading:
+      selectedTeamId !== null &&
+      (query.isLoading || (query.isFetching && query.data === undefined)),
+    isFetching: query.isFetching,
     isError: query.isError,
     error: query.error,
     refetch: query.refetch,

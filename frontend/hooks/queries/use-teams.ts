@@ -1,7 +1,7 @@
 "use client"
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useEffect } from "react"
+import { useLayoutEffect } from "react"
 import { toast } from "sonner"
 
 import { ApiError } from "@/lib/api/types"
@@ -33,7 +33,7 @@ export function useTeams() {
     queryFn: listTeams,
   })
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!query.isSuccess || query.data.length === 0) {
       return
     }

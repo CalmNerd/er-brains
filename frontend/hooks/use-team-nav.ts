@@ -177,6 +177,8 @@ export function useTeamNav() {
   return {
     groups,
     isLoading,
+    isResolvingTeam:
+      !isLoading && teams.length > 0 && selectedTeamId === null,
     isError,
     error,
     refetch,
