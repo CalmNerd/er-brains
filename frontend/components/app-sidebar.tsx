@@ -38,7 +38,15 @@ const user = {
 }
 
 export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
-  const { groups, editingItemId, addTeam, renameTeam, cancelEdit } = useNavTeams(NavMain)
+  const {
+    groups,
+    editingItemId,
+    addTeam,
+    renameTeam,
+    cancelEdit,
+    startEditTeam,
+    deleteTeam,
+  } = useNavTeams(NavMain)
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -65,6 +73,8 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
           onAddItem={addTeam}
           onRenameItem={renameTeam}
           onCancelEdit={cancelEdit}
+          onStartEditItem={(_, itemId) => startEditTeam(itemId)}
+          onDeleteItem={deleteTeam}
         />
       </SidebarContent>
       <SidebarFooter>

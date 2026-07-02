@@ -36,6 +36,8 @@ type NavCollapsibleProps = {
   onAddItem?: (groupTitle: string) => void
   onRenameItem?: (groupTitle: string, itemId: string, title: string) => void
   onCancelEdit?: (groupTitle: string, itemId: string) => void
+  onStartEditItem?: (groupTitle: string, itemId: string) => void
+  onDeleteItem?: (groupTitle: string, itemId: string) => void
 }
 
 export function NavCollapsible({
@@ -44,6 +46,8 @@ export function NavCollapsible({
   onAddItem,
   onRenameItem,
   onCancelEdit,
+  onStartEditItem,
+  onDeleteItem,
 }: NavCollapsibleProps) {
   return (
     <>
@@ -91,6 +95,8 @@ export function NavCollapsible({
                       isEditing={editingItemId === item.id}
                       onRename={(title) => onRenameItem?.(group.title, item.id, title)}
                       onCancelEdit={() => onCancelEdit?.(group.title, item.id)}
+                      onStartEdit={() => onStartEditItem?.(group.title, item.id)}
+                      onDelete={() => onDeleteItem?.(group.title, item.id)}
                     />
                   ))}
                 </SidebarMenu>

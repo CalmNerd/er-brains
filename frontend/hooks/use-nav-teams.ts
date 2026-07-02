@@ -83,11 +83,33 @@ export function useNavTeams(initialGroups: NavCollapsibleGroup[]) {
     setEditingItemId(null)
   }, [])
 
+  const startEditTeam = useCallback((itemId: string) => {
+    setEditingItemId(itemId)
+  }, [])
+
+  const deleteTeam = useCallback((groupTitle: string, itemId: string) => {
+    setGroups((current) =>
+      current.map((group) => {
+        if (group.title !== groupTitle) {
+          return group
+        }
+
+        return {
+          ...group,
+          items: group.items.filter((item) => item.id !== itemId),
+        }
+      })
+    )
+    setEditingItemId((current) => (current === itemId ? null : current))
+  }, [])
+
   return {
     groups,
     editingItemId,
     addTeam,
     renameTeam,
     cancelEdit,
+    startEditTeam,
+    deleteTeam,
   }
 }
