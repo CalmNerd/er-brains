@@ -16,9 +16,11 @@ import { Calendar03Icon } from "@hugeicons/core-free-icons"
 import { TaskBoardView } from "@/components/task-board/task-board-view"
 import { TaskListToolbar } from "@/components/task-list/task-list-toolbar"
 import { TaskListView } from "@/components/task-list/task-list-view"
+import { TaskModal } from "@/components/task-modal/task-modal"
 import { PriorityIndicator } from "@/components/task-list/priority-indicator"
 import { TaskStatusIcon } from "@/components/task-list/task-status-icon"
 import { useTaskDnd } from "@/hooks/use-task-dnd"
+import { useTaskModal } from "@/hooks/use-task-modal"
 import {
   ACTIVE_STATUSES,
   DEFAULT_TASK_FILTERS,
@@ -34,6 +36,12 @@ import {
   formatTaskId,
 } from "@/lib/tasks/utils"
 import type { Task, TaskStatus } from "@/lib/tasks/types"
+import {
+  formValuesToCreateInput,
+  DEFAULT_TASK_FORM_VALUES,
+  TOOLBAR_CREATE_DEFAULTS,
+  type TaskFormValues,
+} from "@/lib/tasks/task-form"
 
 type TaskListProps = {
   data: Task[]
@@ -88,7 +96,17 @@ export function TaskList({ data }: TaskListProps) {
     handleDragEnd,
     updateTaskPriority,
     updateTaskStatus,
+    createTask,
+    updateTask,
+    deleteTask,
   } = useTaskDnd({ initialTasks: data })
+  const {
+    modalState,
+    openCreateModal,
+    openCreateModalForStatus,
+    openEditModal,
+    closeModal,
+  } = useTaskModal()
   const [activeTask, setActiveTask] = React.useState<Task | null>(null)
 
   const filters = React.useMemo(
@@ -128,6 +146,20 @@ export function TaskList({ data }: TaskListProps) {
     [handleDragEnd]
   )
 
+  const handleCreateTask = React.useCallback(
+    (values: TaskFormValues) => {
+      createTask(formValuesToCreateInput(values))
+    },
+    [createTask]
+  )
+
+  const handleUpdateTask = React.useCallback(
+    (taskId: number, values: TaskFormValues) => {
+      updateTask(taskId, formValuesToCreateInput(values))
+    },
+    [updateTask]
+  )
+
   return (
     <div className="flex w-full flex-col px-4 lg:px-6">
       <TaskListToolbar
@@ -136,6 +168,30 @@ export function TaskList({ data }: TaskListProps) {
         onLayoutChange={setLayout}
         onOrderByChange={setOrderBy}
         onResetFilters={handleResetFilters}
+        onCreateTask={() => openCreateModal(TOOLBAR_CREATE_DEFAULTS)}
+      />
+
+      <TaskModal
+        open={modalState.open}
+        mode={modalState.open ? modalState.mode : "create"}
+        initialValues={
+          modalState.open
+            ? modalState.initialValues
+            : DEFAULT_TASK_FORM_VALUES
+        }
+        taskId={
+          modalState.open && modalState.mode === "edit"
+            ? modalState.taskId
+            : undefined
+        }
+        onOpenChange={(open) => {
+          if (!open) {
+            closeModal()
+          }
+        }}
+        onCreate={handleCreateTask}
+        onUpdate={handleUpdateTask}
+        onDelete={deleteTask}
       />
 
       <DndContext
@@ -154,6 +210,8 @@ export function TaskList({ data }: TaskListProps) {
               tasksByStatus={orderedTasksByStatus}
               onPriorityChange={updateTaskPriority}
               onStatusChange={updateTaskStatus}
+              onTaskClick={openEditModal}
+              onAddTask={openCreateModalForStatus}
             />
           ) : (
             <TaskBoardView
@@ -161,6 +219,8 @@ export function TaskList({ data }: TaskListProps) {
               tasksByStatus={orderedTasksByStatus}
               onPriorityChange={updateTaskPriority}
               onStatusChange={updateTaskStatus}
+              onTaskClick={openEditModal}
+              onAddTask={openCreateModalForStatus}
             />
           )}
         </SortableContext>

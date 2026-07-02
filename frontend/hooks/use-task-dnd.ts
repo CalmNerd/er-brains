@@ -16,10 +16,12 @@ import { isSameTaskId } from "@/lib/tasks/types"
 import { findTaskContainer } from "@/lib/tasks/utils"
 import type {
   Task,
+  TaskId,
   TaskPriorityChangeHandler,
   TaskStatus,
   TaskStatusChangeHandler,
 } from "@/lib/tasks/types"
+import type { CreateTaskInput, UpdateTaskInput } from "@/lib/tasks/schema"
 
 type UseTaskDndOptions<TTask extends Task = Task> = {
   initialTasks: TTask[]
@@ -32,6 +34,9 @@ type UseTaskDndReturn<TTask extends Task = Task> = {
   handleDragEnd: (event: DragEndEvent) => void
   updateTaskPriority: TaskPriorityChangeHandler
   updateTaskStatus: TaskStatusChangeHandler
+  createTask: (input: CreateTaskInput) => void
+  updateTask: (taskId: TaskId, updates: UpdateTaskInput) => void
+  deleteTask: (taskId: TaskId) => void
 }
 
 function createEmptyGroupedTasks<TTask extends Task>(): Record<TaskStatus, TTask[]> {
@@ -52,6 +57,22 @@ function groupInitialTasks<TTask extends Task>(
     grouped[task.status].push(task)
   }
   return grouped
+}
+
+function getNextTaskId<TTask extends Task>(
+  grouped: Record<TaskStatus, TTask[]>
+): number {
+  let maxId = 0
+
+  for (const status of STATUS_ORDER) {
+    for (const task of grouped[status]) {
+      if (task.id > maxId) {
+        maxId = task.id
+      }
+    }
+  }
+
+  return maxId + 1
 }
 
 /** Manages grouped task state, drag-and-drop, and inline field updates. */
@@ -169,6 +190,73 @@ export function useTaskDnd<TTask extends Task = Task>({
     []
   )
 
+  const createTask = React.useCallback((input: CreateTaskInput) => {
+    setTasksByStatus((prev) => {
+      const nextId = getNextTaskId(prev)
+      const task = { ...input, id: nextId } as TTask
+
+      return {
+        ...prev,
+        [input.status]: [...prev[input.status], task],
+      }
+    })
+  }, [])
+
+  const updateTask = React.useCallback(
+    (taskId: TaskId, updates: UpdateTaskInput) => {
+      setTasksByStatus((prev) => {
+        for (const currentStatus of STATUS_ORDER) {
+          const index = prev[currentStatus].findIndex(
+            (item) => item.id === taskId
+          )
+          if (index === -1) continue
+
+          const existingTask = prev[currentStatus][index]
+          const nextTask = { ...existingTask, ...updates } as TTask
+          const nextStatus = nextTask.status
+
+          if (nextStatus === currentStatus) {
+            const tasks = [...prev[currentStatus]]
+            tasks[index] = nextTask
+
+            return {
+              ...prev,
+              [currentStatus]: tasks,
+            }
+          }
+
+          return {
+            ...prev,
+            [currentStatus]: prev[currentStatus].filter(
+              (item) => item.id !== taskId
+            ),
+            [nextStatus]: [...prev[nextStatus], nextTask],
+          }
+        }
+
+        return prev
+      })
+    },
+    []
+  )
+
+  const deleteTask = React.useCallback((taskId: TaskId) => {
+    setTasksByStatus((prev) => {
+      let hasChanges = false
+      const next = { ...prev }
+
+      for (const status of STATUS_ORDER) {
+        const filtered = next[status].filter((item) => item.id !== taskId)
+        if (filtered.length !== next[status].length) {
+          next[status] = filtered
+          hasChanges = true
+        }
+      }
+
+      return hasChanges ? next : prev
+    })
+  }, [])
+
   return {
     tasksByStatus,
     sortableIds,
@@ -176,5 +264,8 @@ export function useTaskDnd<TTask extends Task = Task>({
     handleDragEnd,
     updateTaskPriority,
     updateTaskStatus,
+    createTask,
+    updateTask,
+    deleteTask,
   }
 }

@@ -6,6 +6,8 @@ import type { Task, TaskStatus, TaskUpdateHandlers } from "@/lib/tasks/types"
 type TaskBoardViewProps = {
   visibleStatuses: readonly TaskStatus[]
   tasksByStatus: Record<TaskStatus, Task[]>
+  onTaskClick: (task: Task) => void
+  onAddTask: (status: TaskStatus) => void
 } & TaskUpdateHandlers
 
 export function TaskBoardView({
@@ -13,6 +15,8 @@ export function TaskBoardView({
   tasksByStatus,
   onPriorityChange,
   onStatusChange,
+  onTaskClick,
+  onAddTask,
 }: TaskBoardViewProps) {
   return (
     <div className="flex gap-4 overflow-x-auto pb-2">
@@ -23,6 +27,8 @@ export function TaskBoardView({
           tasks={tasksByStatus[status]}
           onPriorityChange={onPriorityChange}
           onStatusChange={onStatusChange}
+          onTaskClick={onTaskClick}
+          onAddTask={onAddTask}
         />
       ))}
     </div>

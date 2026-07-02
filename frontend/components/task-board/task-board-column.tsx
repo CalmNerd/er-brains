@@ -15,6 +15,8 @@ import { cn } from "@/lib/utils"
 type TaskBoardColumnProps = {
   status: TaskStatus
   tasks: Task[]
+  onTaskClick: (task: Task) => void
+  onAddTask: (status: TaskStatus) => void
 } & TaskUpdateHandlers
 
 export function TaskBoardColumn({
@@ -22,6 +24,8 @@ export function TaskBoardColumn({
   tasks,
   onPriorityChange,
   onStatusChange,
+  onTaskClick,
+  onAddTask,
 }: TaskBoardColumnProps) {
   const config = STATUS_CONFIG[status]
   const taskIds = tasks.map((task) => task.id)
@@ -39,6 +43,7 @@ export function TaskBoardColumn({
           size="icon-xs"
           className="ml-auto size-6"
           aria-label={`Add task to ${config.label}`}
+          onClick={() => onAddTask(status)}
         >
           <HugeiconsIcon icon={Add01Icon} strokeWidth={2} className="size-3.5" />
         </Button>
@@ -59,6 +64,7 @@ export function TaskBoardColumn({
                 task={task}
                 onPriorityChange={onPriorityChange}
                 onStatusChange={onStatusChange}
+                onTaskClick={onTaskClick}
               />
             ))
           ) : (

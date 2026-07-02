@@ -5,7 +5,6 @@ import { CSS } from "@dnd-kit/utilities"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Time04Icon } from "@hugeicons/core-free-icons"
 
-import { TaskDetailDialog } from "@/components/task-list/task-detail-dialog"
 import { TaskPriorityDropdown } from "@/components/task-list/task-priority-dropdown"
 import { TaskStatusDropdown } from "@/components/task-list/task-status-dropdown"
 import { formatDueDate } from "@/lib/tasks/utils"
@@ -14,12 +13,19 @@ import { cn } from "@/lib/utils"
 
 type TaskBoardCardProps = {
   task: Task
+  onTaskClick: (task: Task) => void
 } & TaskUpdateHandlers
+
+/** Prevents the card drag handler from starting when opening task details. */
+function stopDragPointerDown(event: React.PointerEvent) {
+  event.stopPropagation()
+}
 
 export function TaskBoardCard({
   task,
   onPriorityChange,
   onStatusChange,
+  onTaskClick,
 }: TaskBoardCardProps) {
   const {
     attributes,
@@ -47,7 +53,14 @@ export function TaskBoardCard({
       {...listeners}
     >
       <div className="mb-2 min-w-0">
-        <TaskDetailDialog task={task} triggerVariant="board" />
+        <button
+          type="button"
+          onPointerDown={stopDragPointerDown}
+          onClick={() => onTaskClick(task)}
+          className="min-w-0 line-clamp-1 text-left text-sm font-medium text-foreground hover:text-primary"
+        >
+          {task.title}
+        </button>
       </div>
 
       <p className="mb-3 line-clamp-2 text-xs leading-relaxed text-muted-foreground">

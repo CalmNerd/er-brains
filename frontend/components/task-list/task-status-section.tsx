@@ -20,6 +20,8 @@ import { cn } from "@/lib/utils"
 type TaskStatusSectionProps = {
   status: TaskStatus
   tasks: Task[]
+  onTaskClick: (task: Task) => void
+  onAddTask: (status: TaskStatus) => void
 } & TaskUpdateHandlers
 
 export function TaskStatusSection({
@@ -27,6 +29,8 @@ export function TaskStatusSection({
   tasks,
   onPriorityChange,
   onStatusChange,
+  onTaskClick,
+  onAddTask,
 }: TaskStatusSectionProps) {
   const config = STATUS_CONFIG[status]
   const taskIds = tasks.map((task) => task.id)
@@ -59,6 +63,7 @@ export function TaskStatusSection({
           size="icon-xs"
           className="size-5 shrink-0"
           aria-label={`Add task to ${config.label}`}
+          onClick={() => onAddTask(status)}
         >
           <HugeiconsIcon icon={Add01Icon} strokeWidth={2} className="size-3.5" />
         </Button>
@@ -81,6 +86,7 @@ export function TaskStatusSection({
                   task={task}
                   onPriorityChange={onPriorityChange}
                   onStatusChange={onStatusChange}
+                  onTaskClick={onTaskClick}
                 />
               ))
             ) : (

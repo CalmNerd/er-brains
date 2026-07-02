@@ -3,7 +3,6 @@
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 
-import { TaskDetailDialog } from "@/components/task-list/task-detail-dialog"
 import { TaskPriorityDropdown } from "@/components/task-list/task-priority-dropdown"
 import { TaskStatusDropdown } from "@/components/task-list/task-status-dropdown"
 import { formatDueDate, formatTaskId } from "@/lib/tasks/utils"
@@ -12,12 +11,19 @@ import { cn } from "@/lib/utils"
 
 type TaskRowProps = {
   task: Task
+  onTaskClick: (task: Task) => void
 } & TaskUpdateHandlers
+
+/** Prevents the row drag handler from starting when opening task details. */
+function stopDragPointerDown(event: React.PointerEvent) {
+  event.stopPropagation()
+}
 
 export function TaskRow({
   task,
   onPriorityChange,
   onStatusChange,
+  onTaskClick,
 }: TaskRowProps) {
   const {
     attributes,
@@ -58,7 +64,14 @@ export function TaskRow({
         onStatusChange={(status) => onStatusChange(task.id, status)}
       />
 
-      <TaskDetailDialog task={task} />
+      <button
+        type="button"
+        onPointerDown={stopDragPointerDown}
+        onClick={() => onTaskClick(task)}
+        className="min-w-0 flex-1 truncate text-left text-sm text-foreground hover:underline"
+      >
+        {task.title}
+      </button>
 
       <span className="ml-auto shrink-0 text-xs text-muted-foreground">
         {formatDueDate(task.dueDate)}

@@ -6,6 +6,8 @@ import type { Task, TaskStatus, TaskUpdateHandlers } from "@/lib/tasks/types"
 type TaskListViewProps = {
   visibleStatuses: readonly TaskStatus[]
   tasksByStatus: Record<TaskStatus, Task[]>
+  onTaskClick: (task: Task) => void
+  onAddTask: (status: TaskStatus) => void
 } & TaskUpdateHandlers
 
 export function TaskListView({
@@ -13,6 +15,8 @@ export function TaskListView({
   tasksByStatus,
   onPriorityChange,
   onStatusChange,
+  onTaskClick,
+  onAddTask,
 }: TaskListViewProps) {
   return (
     <div className="flex flex-col gap-1">
@@ -23,6 +27,8 @@ export function TaskListView({
           tasks={tasksByStatus[status]}
           onPriorityChange={onPriorityChange}
           onStatusChange={onStatusChange}
+          onTaskClick={onTaskClick}
+          onAddTask={onAddTask}
         />
       ))}
     </div>
