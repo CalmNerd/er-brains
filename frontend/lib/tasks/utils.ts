@@ -90,6 +90,10 @@ export function formatDueDate(isoDate: string): string {
 
 /** Builds a Linear-style task identifier from the numeric id. */
 export function formatTaskId(id: TaskId): string {
+  if (id < 0) {
+    return "TSK-00"
+  }
+
   return `TSK-${id}`
 }
 
