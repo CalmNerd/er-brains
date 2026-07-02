@@ -12,4 +12,7 @@ export const endpoints = {
     list: "/api/tasks",
     byId: (id: number) => `/api/tasks/${id}`,
   },
+  ai: {
+    suggest: "/api/ai/suggest",
+  },
 } as const
