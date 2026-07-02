@@ -1,5 +1,6 @@
 import { prisma } from "../../config/db.js";
 import { AppError } from "../../utils/app-error.js";
+import { getDefaultTeamForUser } from "../teams/team.service.js";
 import { parseDueDate, toTaskDto } from "./task.mapper.js";
 import type {
   CreateTaskInput,
@@ -33,6 +34,8 @@ export async function getTaskById(userId: number, taskId: number) {
 }
 
 export async function createTask(userId: number, input: CreateTaskInput) {
+  const defaultTeam = await getDefaultTeamForUser(userId);
+
   const task = await prisma.task.create({
     data: {
       title: input.title,
@@ -41,6 +44,7 @@ export async function createTask(userId: number, input: CreateTaskInput) {
       priority: input.priority,
       status: input.status,
       userId,
+      teamId: defaultTeam.id,
     },
   });
 

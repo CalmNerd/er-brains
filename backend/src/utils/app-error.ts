@@ -4,6 +4,7 @@ export type ErrorCode =
   | "FORBIDDEN"
   | "NOT_FOUND"
   | "TASK_NOT_FOUND"
+  | "TEAM_NOT_FOUND"
   | "USER_NOT_FOUND"
   | "EMAIL_ALREADY_EXISTS"
   | "INVALID_CREDENTIALS"

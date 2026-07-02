@@ -2,6 +2,7 @@ import { prisma } from "../../config/db.js";
 import { AppError } from "../../utils/app-error.js";
 import { comparePassword, hashPassword } from "../../utils/password.js";
 import { signToken } from "../../utils/jwt.js";
+import { DEFAULT_TEAM_NAME } from "../teams/team.service.js";
 import type { LoginInput, SignupInput } from "./auth.validation.js";
 
 function toAuthUser(user: {
@@ -21,18 +22,29 @@ function toAuthUser(user: {
 export async function signup(input: SignupInput) {
   const passwordHash = await hashPassword(input.password);
 
-  const user = await prisma.user.create({
-    data: {
-      email: input.email.toLowerCase(),
-      password: passwordHash,
-      name: input.name ?? null,
-    },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      createdAt: true,
-    },
+  const user = await prisma.$transaction(async (tx) => {
+    const createdUser = await tx.user.create({
+      data: {
+        email: input.email.toLowerCase(),
+        password: passwordHash,
+        name: input.name ?? null,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+      },
+    });
+
+    await tx.team.create({
+      data: {
+        name: DEFAULT_TEAM_NAME,
+        userId: createdUser.id,
+      },
+    });
+
+    return createdUser;
   });
 
   const token = signToken(user.id);
