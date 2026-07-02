@@ -14,20 +14,19 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import { Calendar03Icon } from "@hugeicons/core-free-icons"
 
 import { TaskBoardView } from "@/components/task-board/task-board-view"
+import { TaskListEmpty } from "@/components/task-list/task-list-empty"
+import { TaskListError } from "@/components/task-list/task-list-error"
+import { TaskListSkeleton } from "@/components/task-list/task-list-skeleton"
 import { TaskListToolbar } from "@/components/task-list/task-list-toolbar"
 import { TaskListView } from "@/components/task-list/task-list-view"
 import { TaskModal } from "@/components/task-modal/task-modal"
 import { PriorityIndicator } from "@/components/task-list/priority-indicator"
 import { TaskStatusIcon } from "@/components/task-list/task-status-icon"
+import { useTasks } from "@/hooks/queries/use-tasks"
 import { useTaskDnd } from "@/hooks/use-task-dnd"
-import { useTaskModal } from "@/hooks/use-task-modal"
 import {
   ACTIVE_STATUSES,
-  DEFAULT_TASK_FILTERS,
   STATUS_ORDER,
-  type TaskLayout,
-  type TaskOrderBy,
-  type TaskView,
 } from "@/lib/tasks/constants"
 import {
   applyOrderToGrouped,
@@ -35,17 +34,17 @@ import {
   formatDueDate,
   formatTaskId,
 } from "@/lib/tasks/utils"
-import type { Task, TaskStatus } from "@/lib/tasks/types"
+import type { Task, TaskId, TaskStatus } from "@/lib/tasks/types"
 import {
-  formValuesToCreateInput,
+  buildTaskFormValues,
   DEFAULT_TASK_FORM_VALUES,
+  formValuesToCreateInput,
+  taskToFormValues,
   TOOLBAR_CREATE_DEFAULTS,
   type TaskFormValues,
 } from "@/lib/tasks/task-form"
-
-type TaskListProps = {
-  data: Task[]
-}
+import { useTaskUiStore } from "@/stores/task-ui-store"
+import { useTeamNav } from "@/hooks/use-team-nav"
 
 function ListDragOverlay({ task }: { task: Task }) {
   return (
@@ -84,11 +83,41 @@ function BoardDragOverlay({ task }: { task: Task }) {
   )
 }
 
-export function TaskList({ data }: TaskListProps) {
+export function TaskList() {
   const sortableId = React.useId()
-  const [view, setView] = React.useState<TaskView>(DEFAULT_TASK_FILTERS.view)
-  const [layout, setLayout] = React.useState<TaskLayout>(DEFAULT_TASK_FILTERS.layout)
-  const [orderBy, setOrderBy] = React.useState<TaskOrderBy>(DEFAULT_TASK_FILTERS.orderBy)
+  const view = useTaskUiStore((state) => state.view)
+  const layout = useTaskUiStore((state) => state.layout)
+  const orderBy = useTaskUiStore((state) => state.orderBy)
+  const setView = useTaskUiStore((state) => state.setView)
+  const setLayout = useTaskUiStore((state) => state.setLayout)
+  const setOrderBy = useTaskUiStore((state) => state.setOrderBy)
+  const resetFilters = useTaskUiStore((state) => state.resetFilters)
+  const modalState = useTaskUiStore((state) => state.modalState)
+  const setModalState = useTaskUiStore((state) => state.setModalState)
+  const closeModal = useTaskUiStore((state) => state.closeModal)
+
+  const { selectedTeamId, teams } = useTeamNav()
+  const activeTeamName =
+    teams.find((team) => team.id === selectedTeamId)?.name ?? "Team"
+
+  const {
+    tasks,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    createTask,
+    updateTask,
+    deleteTask,
+  } = useTasks()
+
+  const handleSilentUpdate = React.useCallback(
+    (taskId: TaskId, updates: Parameters<typeof updateTask>[1]) => {
+      void updateTask(taskId, updates, true)
+    },
+    [updateTask]
+  )
+
   const {
     tasksByStatus,
     sortableIds,
@@ -96,17 +125,11 @@ export function TaskList({ data }: TaskListProps) {
     handleDragEnd,
     updateTaskPriority,
     updateTaskStatus,
-    createTask,
-    updateTask,
-    deleteTask,
-  } = useTaskDnd({ initialTasks: data })
-  const {
-    modalState,
-    openCreateModal,
-    openCreateModalForStatus,
-    openEditModal,
-    closeModal,
-  } = useTaskModal()
+  } = useTaskDnd({
+    tasks,
+    onUpdateTask: handleSilentUpdate,
+  })
+
   const [activeTask, setActiveTask] = React.useState<Task | null>(null)
 
   const filters = React.useMemo(
@@ -124,11 +147,35 @@ export function TaskList({ data }: TaskListProps) {
     [tasksByStatus, orderBy]
   )
 
-  const handleResetFilters = React.useCallback(() => {
-    setView(DEFAULT_TASK_FILTERS.view)
-    setLayout(DEFAULT_TASK_FILTERS.layout)
-    setOrderBy(DEFAULT_TASK_FILTERS.orderBy)
-  }, [])
+  const openCreateModal = React.useCallback(
+    (defaults?: Partial<TaskFormValues>) => {
+      setModalState({
+        open: true,
+        mode: "create",
+        initialValues: buildTaskFormValues(defaults),
+      })
+    },
+    [setModalState]
+  )
+
+  const openCreateModalForStatus = React.useCallback(
+    (status: TaskStatus) => {
+      openCreateModal({ status })
+    },
+    [openCreateModal]
+  )
+
+  const openEditModal = React.useCallback(
+    (task: Task) => {
+      setModalState({
+        open: true,
+        mode: "edit",
+        taskId: task.id,
+        initialValues: taskToFormValues(task),
+      })
+    },
+    [setModalState]
+  )
 
   const handleDragStart = React.useCallback(
     (event: DragStartEvent) => {
@@ -147,18 +194,46 @@ export function TaskList({ data }: TaskListProps) {
   )
 
   const handleCreateTask = React.useCallback(
-    (values: TaskFormValues) => {
-      createTask(formValuesToCreateInput(values))
+    async (values: TaskFormValues, createMore: boolean) => {
+      await createTask(formValuesToCreateInput(values))
+
+      if (createMore) {
+        setModalState({
+          open: true,
+          mode: "create",
+          initialValues: buildTaskFormValues(TOOLBAR_CREATE_DEFAULTS),
+        })
+        return
+      }
+
+      closeModal()
     },
-    [createTask]
+    [closeModal, createTask, setModalState]
   )
 
   const handleUpdateTask = React.useCallback(
-    (taskId: number, values: TaskFormValues) => {
-      updateTask(taskId, formValuesToCreateInput(values))
+    async (taskId: TaskId, values: TaskFormValues) => {
+      await updateTask(taskId, formValuesToCreateInput(values))
+      closeModal()
     },
-    [updateTask]
+    [closeModal, updateTask]
   )
+
+  const handleDeleteTask = React.useCallback(
+    async (taskId: TaskId) => {
+      await deleteTask(taskId)
+      closeModal()
+    },
+    [closeModal, deleteTask]
+  )
+
+  if (selectedTeamId === null) {
+    return (
+      <div className="flex w-full flex-col px-4 lg:px-6">
+        <TaskListEmpty onCreateTask={() => openCreateModal(TOOLBAR_CREATE_DEFAULTS)} />
+      </div>
+    )
+  }
 
   return (
     <div className="flex w-full flex-col px-4 lg:px-6">
@@ -167,17 +242,16 @@ export function TaskList({ data }: TaskListProps) {
         onViewChange={setView}
         onLayoutChange={setLayout}
         onOrderByChange={setOrderBy}
-        onResetFilters={handleResetFilters}
+        onResetFilters={resetFilters}
         onCreateTask={() => openCreateModal(TOOLBAR_CREATE_DEFAULTS)}
       />
 
       <TaskModal
         open={modalState.open}
         mode={modalState.open ? modalState.mode : "create"}
+        teamName={activeTeamName}
         initialValues={
-          modalState.open
-            ? modalState.initialValues
-            : DEFAULT_TASK_FORM_VALUES
+          modalState.open ? modalState.initialValues : DEFAULT_TASK_FORM_VALUES
         }
         taskId={
           modalState.open && modalState.mode === "edit"
@@ -191,50 +265,62 @@ export function TaskList({ data }: TaskListProps) {
         }}
         onCreate={handleCreateTask}
         onUpdate={handleUpdateTask}
-        onDelete={deleteTask}
+        onDelete={handleDeleteTask}
       />
 
-      <DndContext
-        id={sortableId}
-        sensors={sensors}
-        collisionDetection={closestCorners}
-        modifiers={layout === "list" ? [restrictToVerticalAxis] : undefined}
-        onDragStart={handleDragStart}
-        onDragEnd={onDragEnd}
-        onDragCancel={() => setActiveTask(null)}
-      >
-        <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
-          {layout === "list" ? (
-            <TaskListView
-              visibleStatuses={visibleStatuses}
-              tasksByStatus={orderedTasksByStatus}
-              onPriorityChange={updateTaskPriority}
-              onStatusChange={updateTaskStatus}
-              onTaskClick={openEditModal}
-              onAddTask={openCreateModalForStatus}
-            />
-          ) : (
-            <TaskBoardView
-              visibleStatuses={visibleStatuses}
-              tasksByStatus={orderedTasksByStatus}
-              onPriorityChange={updateTaskPriority}
-              onStatusChange={updateTaskStatus}
-              onTaskClick={openEditModal}
-              onAddTask={openCreateModalForStatus}
-            />
-          )}
-        </SortableContext>
+      {isLoading ? <TaskListSkeleton layout={layout} /> : null}
 
-        <DragOverlay dropAnimation={null}>
-          {activeTask ? (
-            layout === "list" ? (
-              <ListDragOverlay task={activeTask} />
+      {!isLoading && isError ? (
+        <TaskListError error={error} onRetry={() => void refetch()} />
+      ) : null}
+
+      {!isLoading && !isError && tasks.length === 0 ? (
+        <TaskListEmpty onCreateTask={() => openCreateModal(TOOLBAR_CREATE_DEFAULTS)} />
+      ) : null}
+
+      {!isLoading && !isError && tasks.length > 0 ? (
+        <DndContext
+          id={sortableId}
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          modifiers={layout === "list" ? [restrictToVerticalAxis] : undefined}
+          onDragStart={handleDragStart}
+          onDragEnd={onDragEnd}
+          onDragCancel={() => setActiveTask(null)}
+        >
+          <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
+            {layout === "list" ? (
+              <TaskListView
+                visibleStatuses={visibleStatuses}
+                tasksByStatus={orderedTasksByStatus}
+                onPriorityChange={updateTaskPriority}
+                onStatusChange={updateTaskStatus}
+                onTaskClick={openEditModal}
+                onAddTask={openCreateModalForStatus}
+              />
             ) : (
-              <BoardDragOverlay task={activeTask} />
-            )
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+              <TaskBoardView
+                visibleStatuses={visibleStatuses}
+                tasksByStatus={orderedTasksByStatus}
+                onPriorityChange={updateTaskPriority}
+                onStatusChange={updateTaskStatus}
+                onTaskClick={openEditModal}
+                onAddTask={openCreateModalForStatus}
+              />
+            )}
+          </SortableContext>
+
+          <DragOverlay dropAnimation={null}>
+            {activeTask ? (
+              layout === "list" ? (
+                <ListDragOverlay task={activeTask} />
+              ) : (
+                <BoardDragOverlay task={activeTask} />
+              )
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      ) : null}
     </div>
   )
 }

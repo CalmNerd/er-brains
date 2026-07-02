@@ -20,11 +20,12 @@ import type {
   TaskPriorityChangeHandler,
   TaskStatus,
   TaskStatusChangeHandler,
+  UpdateTaskInput,
 } from "@/lib/tasks/types"
-import type { CreateTaskInput, UpdateTaskInput } from "@/lib/tasks/schema"
 
 type UseTaskDndOptions<TTask extends Task = Task> = {
-  initialTasks: TTask[]
+  tasks: TTask[]
+  onUpdateTask: (taskId: TaskId, updates: UpdateTaskInput) => void
 }
 
 type UseTaskDndReturn<TTask extends Task = Task> = {
@@ -34,9 +35,6 @@ type UseTaskDndReturn<TTask extends Task = Task> = {
   handleDragEnd: (event: DragEndEvent) => void
   updateTaskPriority: TaskPriorityChangeHandler
   updateTaskStatus: TaskStatusChangeHandler
-  createTask: (input: CreateTaskInput) => void
-  updateTask: (taskId: TaskId, updates: UpdateTaskInput) => void
-  deleteTask: (taskId: TaskId) => void
 }
 
 function createEmptyGroupedTasks<TTask extends Task>(): Record<TaskStatus, TTask[]> {
@@ -49,39 +47,27 @@ function createEmptyGroupedTasks<TTask extends Task>(): Record<TaskStatus, TTask
   )
 }
 
-function groupInitialTasks<TTask extends Task>(
-  initialTasks: TTask[]
+function groupTasksByStatus<TTask extends Task>(
+  tasks: TTask[]
 ): Record<TaskStatus, TTask[]> {
   const grouped = createEmptyGroupedTasks<TTask>()
-  for (const task of initialTasks) {
+
+  for (const task of tasks) {
     grouped[task.status].push(task)
   }
+
   return grouped
 }
 
-function getNextTaskId<TTask extends Task>(
-  grouped: Record<TaskStatus, TTask[]>
-): number {
-  let maxId = 0
-
-  for (const status of STATUS_ORDER) {
-    for (const task of grouped[status]) {
-      if (task.id > maxId) {
-        maxId = task.id
-      }
-    }
-  }
-
-  return maxId + 1
-}
-
-/** Manages grouped task state, drag-and-drop, and inline field updates. */
+/** Manages grouped task display and drag-and-drop against server-backed task data. */
 export function useTaskDnd<TTask extends Task = Task>({
-  initialTasks,
+  tasks,
+  onUpdateTask,
 }: UseTaskDndOptions<TTask>): UseTaskDndReturn<TTask> {
-  const [tasksByStatus, setTasksByStatus] = React.useState<
-    Record<TaskStatus, TTask[]>
-  >(() => groupInitialTasks(initialTasks))
+  const tasksByStatus = React.useMemo(
+    () => groupTasksByStatus(tasks),
+    [tasks]
+  )
 
   const sortableIds = React.useMemo<UniqueIdentifier[]>(
     () =>
@@ -97,165 +83,42 @@ export function useTaskDnd<TTask extends Task = Task>({
     useSensor(KeyboardSensor, {})
   )
 
-  const handleDragEnd = React.useCallback((event: DragEndEvent) => {
-    const { active, over } = event
-    if (!over || active.id === over.id) return
+  const handleDragEnd = React.useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event
+      if (!over || active.id === over.id) return
 
-    setTasksByStatus((prev) => {
-      const activeContainer = findTaskContainer(active.id, prev)
-      const overContainer = findTaskContainer(over.id, prev)
-      if (!activeContainer || !overContainer) return prev
+      const activeContainer = findTaskContainer(active.id, tasksByStatus)
+      const overContainer = findTaskContainer(over.id, tasksByStatus)
 
-      const activeItems = [...prev[activeContainer]]
-      const activeIndex = activeItems.findIndex((task) =>
+      if (!activeContainer || !overContainer) return
+
+      const activeTask = tasksByStatus[activeContainer].find((task) =>
         isSameTaskId(active.id, task.id)
       )
-      if (activeIndex === -1) return prev
 
-      const [movedTask] = activeItems.splice(activeIndex, 1)
+      if (!activeTask) return
 
-      if (activeContainer === overContainer) {
-        const overIndex = activeItems.findIndex((task) =>
-          isSameTaskId(over.id, task.id)
-        )
-        const insertIndex = overIndex === -1 ? activeItems.length : overIndex
-        activeItems.splice(insertIndex, 0, movedTask)
-
-        return { ...prev, [activeContainer]: activeItems }
+      if (activeContainer !== overContainer) {
+        onUpdateTask(activeTask.id, { status: overContainer })
       }
-
-      const overItems = [...prev[overContainer]]
-      const overIndex = overItems.findIndex((task) =>
-        isSameTaskId(over.id, task.id)
-      )
-      const insertIndex = overIndex === -1 ? overItems.length : overIndex
-      overItems.splice(insertIndex, 0, {
-        ...movedTask,
-        status: overContainer,
-      } as TTask)
-
-      return {
-        ...prev,
-        [activeContainer]: activeItems,
-        [overContainer]: overItems,
-      }
-    })
-  }, [])
+    },
+    [onUpdateTask, tasksByStatus]
+  )
 
   const updateTaskPriority = React.useCallback<TaskPriorityChangeHandler>(
     (taskId, priority) => {
-      setTasksByStatus((prev) => {
-        const next = { ...prev }
-
-        for (const status of STATUS_ORDER) {
-          const index = next[status].findIndex((task) => task.id === taskId)
-          if (index === -1) continue
-
-          const tasks = [...next[status]]
-          tasks[index] = { ...tasks[index], priority }
-          next[status] = tasks
-          return next
-        }
-
-        return prev
-      })
+      onUpdateTask(taskId, { priority })
     },
-    []
+    [onUpdateTask]
   )
 
   const updateTaskStatus = React.useCallback<TaskStatusChangeHandler>(
     (taskId, status) => {
-      setTasksByStatus((prev) => {
-        for (const currentStatus of STATUS_ORDER) {
-          const index = prev[currentStatus].findIndex(
-            (item) => item.id === taskId
-          )
-          if (index === -1) continue
-
-          const task = prev[currentStatus][index]
-          if (task.status === status) return prev
-
-          return {
-            ...prev,
-            [currentStatus]: prev[currentStatus].filter(
-              (item) => item.id !== taskId
-            ),
-            [status]: [...prev[status], { ...task, status } as TTask],
-          }
-        }
-
-        return prev
-      })
+      onUpdateTask(taskId, { status })
     },
-    []
+    [onUpdateTask]
   )
-
-  const createTask = React.useCallback((input: CreateTaskInput) => {
-    setTasksByStatus((prev) => {
-      const nextId = getNextTaskId(prev)
-      const task = { ...input, id: nextId } as TTask
-
-      return {
-        ...prev,
-        [input.status]: [...prev[input.status], task],
-      }
-    })
-  }, [])
-
-  const updateTask = React.useCallback(
-    (taskId: TaskId, updates: UpdateTaskInput) => {
-      setTasksByStatus((prev) => {
-        for (const currentStatus of STATUS_ORDER) {
-          const index = prev[currentStatus].findIndex(
-            (item) => item.id === taskId
-          )
-          if (index === -1) continue
-
-          const existingTask = prev[currentStatus][index]
-          const nextTask = { ...existingTask, ...updates } as TTask
-          const nextStatus = nextTask.status
-
-          if (nextStatus === currentStatus) {
-            const tasks = [...prev[currentStatus]]
-            tasks[index] = nextTask
-
-            return {
-              ...prev,
-              [currentStatus]: tasks,
-            }
-          }
-
-          return {
-            ...prev,
-            [currentStatus]: prev[currentStatus].filter(
-              (item) => item.id !== taskId
-            ),
-            [nextStatus]: [...prev[nextStatus], nextTask],
-          }
-        }
-
-        return prev
-      })
-    },
-    []
-  )
-
-  const deleteTask = React.useCallback((taskId: TaskId) => {
-    setTasksByStatus((prev) => {
-      let hasChanges = false
-      const next = { ...prev }
-
-      for (const status of STATUS_ORDER) {
-        const filtered = next[status].filter((item) => item.id !== taskId)
-        if (filtered.length !== next[status].length) {
-          next[status] = filtered
-          hasChanges = true
-        }
-      }
-
-      return hasChanges ? next : prev
-    })
-  }, [])
 
   return {
     tasksByStatus,
@@ -264,8 +127,5 @@ export function useTaskDnd<TTask extends Task = Task>({
     handleDragEnd,
     updateTaskPriority,
     updateTaskStatus,
-    createTask,
-    updateTask,
-    deleteTask,
   }
 }

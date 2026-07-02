@@ -25,11 +25,10 @@ import type { TaskId } from "@/lib/tasks/types"
 import { formatTaskId } from "@/lib/tasks/utils"
 import { cn } from "@/lib/utils"
 
-const TEAM_NAME = "My Team"
-
 type TaskModalProps = {
   open: boolean
   mode: "create" | "edit"
+  teamName: string
   initialValues: TaskFormValues
   taskId?: TaskId
   onOpenChange: (open: boolean) => void
@@ -70,6 +69,7 @@ function CreateMoreToggle({
 export function TaskModal({
   open,
   mode,
+  teamName,
   initialValues,
   taskId,
   onOpenChange,
@@ -149,7 +149,7 @@ export function TaskModal({
         <div className="flex items-center justify-between gap-3 border-b px-5 py-3">
           <div className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
             <span className="text-foreground inline-flex items-center gap-1.5 font-medium whitespace-nowrap">
-              {TEAM_NAME}
+              {teamName}
             </span>
             <HugeiconsIcon
               icon={ArrowRight01Icon}
