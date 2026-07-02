@@ -1,6 +1,6 @@
 import { prisma } from "../../config/db.js";
 import { AppError } from "../../utils/app-error.js";
-import { getDefaultTeamForUser } from "../teams/team.service.js";
+import { assertTeamOwnedByUser } from "../teams/team.service.js";
 import { parseDueDate, toTaskDto } from "./task.mapper.js";
 import type {
   CreateTaskInput,
@@ -9,9 +9,12 @@ import type {
 } from "./task.validation.js";
 
 export async function listTasks(userId: number, query: TaskQueryInput) {
+  await assertTeamOwnedByUser(userId, query.teamId);
+
   const tasks = await prisma.task.findMany({
     where: {
       userId,
+      teamId: query.teamId,
       ...(query.status ? { status: query.status } : {}),
       ...(query.priority ? { priority: query.priority } : {}),
     },
@@ -34,7 +37,7 @@ export async function getTaskById(userId: number, taskId: number) {
 }
 
 export async function createTask(userId: number, input: CreateTaskInput) {
-  const defaultTeam = await getDefaultTeamForUser(userId);
+  await assertTeamOwnedByUser(userId, input.teamId);
 
   const task = await prisma.task.create({
     data: {
@@ -44,7 +47,7 @@ export async function createTask(userId: number, input: CreateTaskInput) {
       priority: input.priority,
       status: input.status,
       userId,
-      teamId: defaultTeam.id,
+      teamId: input.teamId,
     },
   });
 

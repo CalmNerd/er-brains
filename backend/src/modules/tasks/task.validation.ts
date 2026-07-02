@@ -13,6 +13,7 @@ export const taskSchema = z.object({
 });
 
 export const createTaskSchema = z.object({
+  teamId: z.number().int().positive(),
   title: z.string().trim().min(1, "Title is required"),
   description: z.string().default(""),
   dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Due date must be YYYY-MM-DD"),
@@ -36,6 +37,7 @@ export const updateTaskSchema = z
   });
 
 export const taskQuerySchema = z.object({
+  teamId: z.coerce.number().int().positive(),
   status: taskStatusSchema.optional(),
   priority: taskPrioritySchema.optional(),
 });
