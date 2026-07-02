@@ -5,6 +5,7 @@ import { ArrowRightIcon, Play } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 
 import { DashboardPreviewFrame } from "@/components/landing/dashboard-preview-frame"
+import { LogoCloud } from "@/components/landing/logo-cloud/logo-cloud"
 import { Button } from "@/components/ui/button"
 
 export function LandingHero() {
@@ -54,14 +55,7 @@ export function LandingHero() {
               </div>
             </div>
 
-            <div className="mt-10">
-              <p className="text-muted-foreground">Trusted by teams at:</p>
-              <div className="**:fill-foreground mt-6 flex items-center justify-center gap-8 md:justify-start">
-                <span>Me</span>
-                <span>My Friends</span>
-                <span>You (maybe)</span>
-              </div>
-            </div>
+            <LogoCloud className="mt-10" />
           </div>
         </div>
 
