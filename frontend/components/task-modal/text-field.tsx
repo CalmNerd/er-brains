@@ -4,7 +4,7 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-type NotionTextFieldProps = {
+type TextFieldProps = {
   value: string
   onChange: (value: string) => void
   placeholder: string
@@ -14,7 +14,7 @@ type NotionTextFieldProps = {
   autoFocus?: boolean
 }
 
-export function NotionTextField({
+export function TextField({
   value,
   onChange,
   placeholder,
@@ -22,7 +22,7 @@ export function NotionTextField({
   className,
   inputClassName,
   autoFocus = false,
-}: NotionTextFieldProps) {
+}: TextFieldProps) {
   const textareaRef = React.useRef<HTMLTextAreaElement>(null)
 
   const resizeTextarea = React.useCallback(() => {

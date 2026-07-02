@@ -8,8 +8,9 @@ import {
   Delete02Icon,
 } from "@hugeicons/core-free-icons"
 
-import { NotionTextField } from "@/components/task-modal/text-field"
+import { SuggestionField } from "@/components/task-modal/suggestion-field"
 import { TaskModalMetadata } from "@/components/task-modal/task-modal-metadata"
+import { useTaskAiSuggestions } from "@/components/task-modal/use-task-ai-suggestions"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -103,6 +104,24 @@ export function TaskModal({
     },
     []
   )
+
+  const aiEnabled = open
+
+  const {
+    getDisplayValue,
+    getPriorityDisplay,
+    fieldStatuses,
+    handleFieldChange,
+    acceptField,
+    rejectField,
+    isFieldPending,
+    isFieldLoading,
+  } = useTaskAiSuggestions({
+    enabled: aiEnabled,
+    open,
+    values,
+    onApplyField: updateField,
+  })
 
   const canSubmit = canSubmitTaskForm(mode, values, initialValues)
 
@@ -209,24 +228,41 @@ export function TaskModal({
         </div>
 
         <div className="min-w-0 flex-1 space-y-4 overflow-x-hidden overflow-y-auto px-5 py-4">
-          <NotionTextField
-            value={values.title}
-            onChange={(title) => updateField("title", title)}
+          <SuggestionField
+            value={getDisplayValue("title")}
+            onChange={(title) => handleFieldChange("title", title)}
             placeholder="Task title"
             autoFocus={mode === "create"}
             multiline
             inputClassName="text-2xl font-medium text-foreground"
+            isPending={isFieldPending("title")}
+            isLoading={isFieldLoading("title")}
+            onAccept={() => acceptField("title")}
+            onReject={() => rejectField("title")}
           />
 
-          <NotionTextField
-            value={values.description}
-            onChange={(description) => updateField("description", description)}
+          <SuggestionField
+            value={getDisplayValue("description")}
+            onChange={(description) =>
+              handleFieldChange("description", description)
+            }
             placeholder="Add description..."
             multiline
             inputClassName="text-sm leading-relaxed text-muted-foreground"
+            isPending={isFieldPending("description")}
+            isLoading={isFieldLoading("description")}
+            onAccept={() => acceptField("description")}
+            onReject={() => rejectField("description")}
           />
 
-          <TaskModalMetadata values={values} onChange={updateField} />
+          <TaskModalMetadata
+            values={values}
+            onChange={updateField}
+            priorityDisplay={getPriorityDisplay()}
+            prioritySuggestionStatus={fieldStatuses.priority}
+            onAcceptPriority={() => acceptField("priority")}
+            onRejectPriority={() => rejectField("priority")}
+          />
         </div>
 
         <div className="flex shrink-0 items-center justify-between gap-4 border-t px-5 py-4">
