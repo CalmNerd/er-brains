@@ -35,9 +35,26 @@ export const DEFAULT_TASK_FILTERS = {
 
 export const STATUS_CONFIG: Record<
   TaskStatus,
-  { label: string; defaultExpanded: boolean }
+  {
+    label: string
+    defaultExpanded: boolean
+    triggerClassName: string
+  }
 > = {
-  "To Do": { label: "To Do", defaultExpanded: true },
-  "In Progress": { label: "In Progress", defaultExpanded: true },
-  Done: { label: "Done", defaultExpanded: false },
+  "To Do": {
+    label: "To Do",
+    defaultExpanded: true,
+    triggerClassName: "bg-muted/20 hover:bg-muted/40 border-border/10",
+  },
+  "In Progress": {
+    label: "In Progress",
+    defaultExpanded: true,
+    triggerClassName:
+      "bg-amber-200/10 hover:bg-amber-200/15 border-amber-200/5",
+  },
+  Done: {
+    label: "Done",
+    defaultExpanded: false,
+    triggerClassName: "bg-blue-200/10 hover:bg-blue-200/15 border-blue-200/5",
+  },
 }

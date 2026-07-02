@@ -39,7 +39,12 @@ export function TaskStatusSection({
 
   return (
     <Collapsible defaultOpen={config.defaultExpanded} className="group/section">
-      <div className="mb-[1px] flex items-center gap-1 rounded-md border border-border/20 bg-muted/20 p-2 hover:bg-muted/40">
+      <div
+        className={cn(
+          "mb-[1px] flex items-center gap-1 rounded-md border p-2 transition-colors",
+          config.triggerClassName
+        )}
+      >
         <CollapsibleTrigger className="flex size-5 shrink-0 items-center justify-center rounded outline-hidden focus-visible:ring-2 focus-visible:ring-ring">
           <HugeiconsIcon
             icon={ArrowRight01Icon}
