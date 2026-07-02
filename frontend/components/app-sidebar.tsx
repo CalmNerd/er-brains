@@ -1,12 +1,14 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { ComponentProps } from "react"
 
+import { AppSidebarTeamsSkeleton } from "@/components/app-sidebar-teams-skeleton"
 import {
   NavCollapsible,
-  type NavCollapsibleGroup,
 } from "@/components/nav-collapsible"
-import { useNavTeams } from "@/hooks/use-nav-teams"
+import { useCurrentUser } from "@/hooks/queries/use-current-user"
+import { useTeamNav } from "@/hooks/use-team-nav"
 import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
@@ -17,36 +19,31 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { logout } from "@/lib/auth/clear-app-state"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 
-const NavMain: NavCollapsibleGroup[] = [
-  {
-    title: "Your Teams",
-    url: "#",
-    items: [
-      { id: "team-1", title: "Team 1", url: "#", isActive: true },
-      { id: "team-2", title: "Team 2", url: "#" },
-      { id: "team-3", title: "Team 3", url: "#" },
-    ],
-  },
-]
-
-const user = {
-  name: "ER Brains",
-  email: "m@example.com",
-  avatar: "/assets/logo.png",
-}
-
 export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
+  const router = useRouter()
+  const { user } = useCurrentUser()
+
   const {
     groups,
-    editingItemId,
+    isLoading,
+    isError,
+    refetch,
+    editingTeamId,
     addTeam,
     renameTeam,
     cancelEdit,
     startEditTeam,
     deleteTeam,
-  } = useNavTeams(NavMain)
+    selectTeam,
+  } = useTeamNav()
+
+  const handleLogout = () => {
+    logout()
+    router.replace("/login")
+  }
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -55,7 +52,7 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               className="data-[slot=sidebar-menu-button]:p-1.5!"
-              render={<a href="#" />}
+              render={<a href="/dashboard" />}
             >
               <Avatar>
                 <AvatarImage src="/assets/logo.png" />
@@ -67,18 +64,41 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavCollapsible
-          items={groups}
-          editingItemId={editingItemId}
-          onAddItem={addTeam}
-          onRenameItem={renameTeam}
-          onCancelEdit={cancelEdit}
-          onStartEditItem={(_, itemId) => startEditTeam(itemId)}
-          onDeleteItem={deleteTeam}
-        />
+        {isLoading ? (
+          <AppSidebarTeamsSkeleton />
+        ) : isError ? (
+          <div className="space-y-2 px-4 py-2 text-xs">
+            <p className="text-muted-foreground">Unable to load teams.</p>
+            <button
+              type="button"
+              className="text-foreground underline underline-offset-4"
+              onClick={() => void refetch()}
+            >
+              Try again
+            </button>
+          </div>
+        ) : (
+          <NavCollapsible
+            items={groups}
+            editingItemId={editingTeamId}
+            onAddItem={() => addTeam()}
+            onSelectItem={(_, itemId) => selectTeam(itemId)}
+            onRenameItem={renameTeam}
+            onCancelEdit={cancelEdit}
+            onStartEditItem={(_, itemId) => startEditTeam(itemId)}
+            onDeleteItem={deleteTeam}
+          />
+        )}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user} />
+        <NavUser
+          user={{
+            name: user?.name ?? "User",
+            email: user?.email ?? "",
+            avatar: "/assets/logo.png",
+          }}
+          onLogout={handleLogout}
+        />
       </SidebarFooter>
     </Sidebar>
   )

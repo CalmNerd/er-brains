@@ -14,6 +14,7 @@ import type { NavCollapsibleItem } from "@/components/nav-collapsible"
 type NavCollapsibleItemRowProps = {
   item: NavCollapsibleItem
   isEditing: boolean
+  onSelect?: () => void
   onRename: (title: string) => void
   onCancelEdit: () => void
   onStartEdit: () => void
@@ -23,6 +24,7 @@ type NavCollapsibleItemRowProps = {
 export function NavCollapsibleItemRow({
   item,
   isEditing,
+  onSelect,
   onRename,
   onCancelEdit,
   onStartEdit,
@@ -91,12 +93,13 @@ export function NavCollapsibleItemRow({
             "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
         )}
       >
-        <a
-          href={item.url}
-          className="flex min-w-0 flex-1 items-center truncate text-sm outline-hidden focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+        <button
+          type="button"
+          onClick={onSelect}
+          className="flex min-w-0 flex-1 items-center truncate text-left text-sm outline-hidden focus-visible:ring-2 focus-visible:ring-sidebar-ring"
         >
-          {item.title}
-        </a>
+          {item.title || "Untitled team"}
+        </button>
 
         <Button
           type="button"

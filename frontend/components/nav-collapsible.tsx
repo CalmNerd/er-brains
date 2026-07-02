@@ -34,6 +34,7 @@ type NavCollapsibleProps = {
   items: NavCollapsibleGroup[]
   editingItemId?: string | null
   onAddItem?: (groupTitle: string) => void
+  onSelectItem?: (groupTitle: string, itemId: string) => void
   onRenameItem?: (groupTitle: string, itemId: string, title: string) => void
   onCancelEdit?: (groupTitle: string, itemId: string) => void
   onStartEditItem?: (groupTitle: string, itemId: string) => void
@@ -44,6 +45,7 @@ export function NavCollapsible({
   items,
   editingItemId = null,
   onAddItem,
+  onSelectItem,
   onRenameItem,
   onCancelEdit,
   onStartEditItem,
@@ -93,6 +95,7 @@ export function NavCollapsible({
                       key={item.id}
                       item={item}
                       isEditing={editingItemId === item.id}
+                      onSelect={() => onSelectItem?.(group.title, item.id)}
                       onRename={(title) => onRenameItem?.(group.title, item.id, title)}
                       onCancelEdit={() => onCancelEdit?.(group.title, item.id)}
                       onStartEdit={() => onStartEditItem?.(group.title, item.id)}
