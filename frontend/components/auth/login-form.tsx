@@ -9,10 +9,11 @@ import { AuthLayout } from "@/components/auth/auth-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ApiError } from "@/lib/api/client"
+import { ApiError } from "@/lib/api/types"
 import { login as loginRequest } from "@/lib/auth/api"
 import { loginSchema, type LoginInput } from "@/lib/auth/schema"
 import { setAuthToken } from "@/lib/auth/storage"
+import { useAuthStore } from "@/stores/auth-store"
 
 const initialValues: LoginInput = {
   email: "",
@@ -21,6 +22,7 @@ const initialValues: LoginInput = {
 
 export function LoginForm() {
   const router = useRouter()
+  const setUser = useAuthStore((state) => state.setUser)
   const [values, setValues] = useState<LoginInput>(initialValues)
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof LoginInput, string>>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -48,6 +50,7 @@ export function LoginForm() {
     try {
       const result = await loginRequest(parsed.data)
       setAuthToken(result.token)
+      setUser(result.user)
       toast.success("Welcome back!")
       router.push("/dashboard")
     } catch (error) {
