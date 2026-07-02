@@ -144,11 +144,11 @@ export function TaskModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="gap-0 overflow-hidden p-0 sm:max-w-2xl"
+        className="flex max-h-[min(90vh,48rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl"
       >
-        <div className="flex items-center justify-between gap-3 border-b px-5 py-3">
-          <div className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
-            <span className="text-foreground inline-flex items-center gap-1.5 font-medium whitespace-nowrap">
+        <div className="flex shrink-0 items-center justify-between gap-3 border-b px-5 py-3">
+          <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden text-xs text-muted-foreground">
+            <span className="text-foreground inline-flex shrink-0 items-center gap-1.5 font-medium whitespace-nowrap">
               {teamName}
             </span>
             <HugeiconsIcon
@@ -157,10 +157,10 @@ export function TaskModal({
               className="size-3 shrink-0"
             />
             {mode === "create" ? (
-              <span>New task</span>
+              <span className="shrink-0">New task</span>
             ) : (
               <>
-                <span>Task</span>
+                <span className="shrink-0">Task</span>
                 <HugeiconsIcon
                   icon={ArrowRight01Icon}
                   strokeWidth={2}
@@ -173,13 +173,14 @@ export function TaskModal({
             )}
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="flex shrink-0 items-center gap-1">
             {mode === "edit" && onDelete ? (
               <Button
                 type="button"
                 variant="ghost"
                 size="icon-sm"
                 aria-label="Delete task"
+                className="hover:text-destructive"
                 onClick={handleDelete}
               >
                 <HugeiconsIcon icon={Delete02Icon} strokeWidth={2} />
@@ -200,12 +201,13 @@ export function TaskModal({
           </div>
         </div>
 
-        <div className="space-y-4 px-5 py-4">
+        <div className="min-w-0 flex-1 space-y-4 overflow-x-hidden overflow-y-auto px-5 py-4">
           <NotionTextField
             value={values.title}
             onChange={(title) => updateField("title", title)}
             placeholder="Task title"
             autoFocus={mode === "create"}
+            multiline
             inputClassName="text-2xl font-medium text-foreground"
           />
 
@@ -220,7 +222,7 @@ export function TaskModal({
           <TaskModalMetadata values={values} onChange={updateField} />
         </div>
 
-        <div className="flex items-center justify-between gap-4 border-t px-5 py-4">
+        <div className="flex shrink-0 items-center justify-between gap-4 border-t px-5 py-4">
           {mode === "create" ? (
             <label className="flex cursor-pointer items-center gap-2">
               <CreateMoreToggle

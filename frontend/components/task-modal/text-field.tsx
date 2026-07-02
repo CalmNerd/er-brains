@@ -41,7 +41,7 @@ export function NotionTextField({
 
   if (multiline) {
     return (
-      <div className={cn("w-full", className)}>
+      <div className={cn("min-w-0 max-w-full overflow-hidden", className)}>
         <textarea
           ref={textareaRef}
           value={value}
@@ -53,7 +53,7 @@ export function NotionTextField({
             resizeTextarea()
           }}
           className={cn(
-            "placeholder:text-muted-foreground/70 w-full resize-none border-0 bg-transparent p-0 shadow-none outline-none focus:ring-0",
+            "placeholder:text-muted-foreground/70 max-w-full min-w-0 w-full resize-none overflow-x-hidden break-words border-0 bg-transparent p-0 shadow-none outline-none [overflow-wrap:anywhere] focus:ring-0",
             inputClassName
           )}
         />
@@ -62,7 +62,7 @@ export function NotionTextField({
   }
 
   return (
-    <div className={cn("w-full", className)}>
+    <div className={cn("min-w-0 max-w-full overflow-hidden", className)}>
       <input
         type="text"
         value={value}
@@ -70,7 +70,7 @@ export function NotionTextField({
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
         className={cn(
-          "placeholder:text-muted-foreground/70 w-full border-0 bg-transparent p-0 shadow-none outline-none focus:ring-0",
+          "placeholder:text-muted-foreground/70 max-w-full min-w-0 w-full overflow-x-hidden border-0 bg-transparent p-0 shadow-none outline-none focus:ring-0",
           inputClassName
         )}
       />
