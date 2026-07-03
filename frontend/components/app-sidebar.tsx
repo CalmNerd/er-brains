@@ -20,7 +20,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { logout } from "@/lib/auth/clear-app-state"
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
+import Image from "next/image"
 
 export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
   const router = useRouter()
@@ -54,11 +54,7 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:p-1.5!"
               render={<a href="/dashboard" />}
             >
-              <Avatar>
-                <AvatarImage src="/assets/logo.png" />
-                <AvatarFallback>ER</AvatarFallback>
-              </Avatar>
-              <span className="text-base font-semibold">ER Brains</span>
+              <Image src="/assets/erbrains-logo.png" alt="ER Brains" width={100} height={100} className="mx-auto" />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
