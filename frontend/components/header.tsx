@@ -34,8 +34,8 @@ export const HeroHeader = () => {
                             <Link
                                 href="/"
                                 aria-label="home"
-                                className="flex items-center space-x-2">
-                                    <Image src="/assets/logo.png" alt="ER Brains" width={100} height={100} className='size-16' />
+                                className="flex items-center space-x-2 py-4">
+                                    <Image src="/assets/erbrains-logo.png" alt="ER Brains" width={100} height={100} />
                             </Link>
 
                             {/* <button

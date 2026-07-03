@@ -84,7 +84,7 @@ export function AuthLayout({
         </Link>
 
         <div className="flex items-center justify-center gap-1.5 px-8 pt-10 pb-6 text-lg font-medium lg:pt-12">
-          <Image src="/assets/logo.png" alt="ER Brains" width={100} height={100} />
+          <Image src="/assets/erbrains-logo.png" alt="ER Brains" width={100} height={100} />
         </div>
 
         <div className="flex flex-1 flex-col justify-center px-8">{children}</div>
