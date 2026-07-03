@@ -69,9 +69,13 @@ export function SuggestionField({
   onAccept,
   onReject,
 }: SuggestionFieldProps) {
+  const lineHeightClassName = cn(inputClassName)
+
   return (
     <div className="flex min-w-0 items-start gap-2">
-      <div className="relative min-w-0 flex-1">
+      <div
+        className={cn("relative min-w-0 flex-1", lineHeightClassName)}
+      >
         <TextField
           value={value}
           onChange={onChange}
@@ -84,10 +88,12 @@ export function SuggestionField({
           )}
         />
         {isLoading ? (
-          <span
+          <div
             aria-hidden
-            className="pointer-events-none absolute top-0 right-0 size-3 animate-pulse rounded-full bg-muted-foreground/40"
-          />
+            className="pointer-events-none absolute top-0 right-0 flex h-[1lh] items-center"
+          >
+            <span className="size-3 animate-pulse rounded-full bg-muted-foreground/40" />
+          </div>
         ) : null}
       </div>
 
@@ -95,7 +101,7 @@ export function SuggestionField({
         <SuggestionFieldActions
           onAccept={onAccept}
           onReject={onReject}
-          className="items-start pt-0.5"
+          className={cn("h-[1lh] items-center", lineHeightClassName)}
         />
       ) : null}
     </div>
