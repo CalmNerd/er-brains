@@ -36,3 +36,27 @@ export function formatCalendarDate(isoDate: string): string {
 
   return date.toLocaleDateString("en-US", { month: "short", year: "numeric" })
 }
+
+/** Converts a local Date to a YYYY-MM-DD string. */
+export function toCalendarDate(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+
+  return `${year}-${month}-${day}`
+}
+
+export const DUE_DATE_PRESETS = [
+  { label: "Today", offsetDays: 0 },
+  { label: "Tomorrow", offsetDays: 1 },
+  { label: "In 3 days", offsetDays: 3 },
+  { label: "In a week", offsetDays: 7 },
+] as const
+
+/** Resolves a preset offset from today into a YYYY-MM-DD string. */
+export function getPresetCalendarDate(offsetDays: number): string {
+  const date = parseCalendarDate(getLocalCalendarDate())
+  date.setDate(date.getDate() + offsetDays)
+
+  return toCalendarDate(date)
+}

@@ -44,35 +44,46 @@ export function TaskRow({
       }}
       data-dragging={isDragging}
       className={cn(
-        "group/row flex h-9 cursor-grab items-center gap-2 rounded-md p-2 active:cursor-grabbing",
+        "group/row flex h-9 cursor-default items-center gap-2 rounded-md p-2 active:cursor-grabbing",
         "hover:bg-muted/50",
         "data-[dragging=true]:z-10 data-[dragging=true]:bg-muted data-[dragging=true]:opacity-90 data-[dragging=true]:shadow-sm"
       )}
       {...attributes}
       {...listeners}
+      onClick={() => {
+        if (isDragging) return
+        onTaskClick(task)
+      }}
+      onKeyDown={(event) => {
+        if (event.key !== "Enter" && event.key !== " ") return
+
+        event.preventDefault()
+        onTaskClick(task)
+      }}
     >
-      <TaskPriorityDropdown
-        priority={task.priority}
-        onPriorityChange={(priority) => onPriorityChange(task.id, priority)}
-      />
+      <div
+        className="flex shrink-0 items-center gap-2"
+        onClick={(event) => event.stopPropagation()}
+        onPointerDown={stopDragPointerDown}
+      >
+        <TaskPriorityDropdown
+          priority={task.priority}
+          onPriorityChange={(priority) => onPriorityChange(task.id, priority)}
+        />
+
+        <TaskStatusDropdown
+          status={task.status}
+          onStatusChange={(status) => onStatusChange(task.id, status)}
+        />
+      </div>
 
       <span className="w-14 shrink-0 text-xs text-muted-foreground">
         {formatTaskId(task.id)}
       </span>
 
-      <TaskStatusDropdown
-        status={task.status}
-        onStatusChange={(status) => onStatusChange(task.id, status)}
-      />
-
-      <button
-        type="button"
-        onPointerDown={stopDragPointerDown}
-        onClick={() => onTaskClick(task)}
-        className="min-w-0 flex-1 truncate text-left text-sm text-foreground hover:underline"
-      >
+      <p className="min-w-0 flex-1 truncate text-sm text-foreground">
         {task.title}
-      </button>
+      </p>
 
       <TaskDueDate task={task} className="ml-auto shrink-0" />
     </div>

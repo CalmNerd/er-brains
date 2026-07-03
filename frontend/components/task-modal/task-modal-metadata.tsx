@@ -12,10 +12,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+import { DatePicker } from "@/components/ui/date-picker"
 import type { FieldSuggestionStatus } from "@/lib/ai/types"
-import { formatDueDate } from "@/lib/tasks/utils"
 import type { TaskFormValues } from "@/lib/tasks/task-form"
+import { formatDueDate } from "@/lib/tasks/utils"
 import { TASK_PRIORITIES, TASK_STATUSES, type TaskPriority } from "@/lib/tasks/types"
 import { cn } from "@/lib/utils"
 
@@ -134,24 +134,17 @@ export function TaskModalMetadata({
         </DropdownMenu>
       )}
 
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          className="outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
-          aria-label="Change due date"
-        >
-          <MetadataPill>
-            <HugeiconsIcon icon={Calendar03Icon} strokeWidth={2} className="size-3.5" />
-            <span>{formatDueDate(values.dueDate)}</span>
-          </MetadataPill>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-56 p-3">
-          <Input
-            type="date"
-            value={values.dueDate}
-            onChange={(event) => onChange("dueDate", event.target.value)}
-          />
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <DatePicker
+        value={values.dueDate}
+        onChange={(dueDate) => onChange("dueDate", dueDate)}
+        triggerClassName={cn(
+          "inline-flex h-7 w-auto items-center gap-1.5 rounded-full border border-border/60 bg-muted/30 px-2.5 text-xs font-medium text-foreground hover:bg-muted/50"
+        )}
+        align="start"
+      >
+        <HugeiconsIcon icon={Calendar03Icon} strokeWidth={2} className="size-3.5" />
+        <span>{formatDueDate(values.dueDate)}</span>
+      </DatePicker>
     </div>
   )
 }

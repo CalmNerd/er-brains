@@ -45,22 +45,27 @@ export function TaskBoardCard({
       }}
       data-dragging={isDragging}
       className={cn(
-        "group/card cursor-grab rounded-lg border bg-card p-3 active:cursor-grabbing",
+        "group/card rounded-lg cursor-default border bg-card p-3 active:cursor-grabbing",
         "hover:border-border/80",
         "data-[dragging=true]:z-10 data-[dragging=true]:opacity-90 data-[dragging=true]:shadow-md"
       )}
       {...attributes}
       {...listeners}
+      onClick={() => {
+        if (isDragging) return
+        onTaskClick(task)
+      }}
+      onKeyDown={(event) => {
+        if (event.key !== "Enter" && event.key !== " ") return
+
+        event.preventDefault()
+        onTaskClick(task)
+      }}
     >
       <div className="mb-2 min-w-0">
-        <button
-          type="button"
-          onPointerDown={stopDragPointerDown}
-          onClick={() => onTaskClick(task)}
-          className="min-w-0 line-clamp-1 text-left text-sm font-medium text-foreground hover:text-primary"
-        >
+        <p className="min-w-0 line-clamp-1 text-sm font-medium text-foreground group-hover/card:text-primary">
           {task.title}
-        </button>
+        </p>
       </div>
 
       <p className="mb-3 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
@@ -77,15 +82,21 @@ export function TaskBoardCard({
           <TaskDueDate task={task} className="truncate" />
         </div>
 
-        <TaskPriorityDropdown
-          priority={task.priority}
-          onPriorityChange={(priority) => onPriorityChange(task.id, priority)}
-        />
+        <div
+          className="flex shrink-0 items-center gap-2"
+          onClick={(event) => event.stopPropagation()}
+          onPointerDown={stopDragPointerDown}
+        >
+          <TaskPriorityDropdown
+            priority={task.priority}
+            onPriorityChange={(priority) => onPriorityChange(task.id, priority)}
+          />
 
-        <TaskStatusDropdown
-          status={task.status}
-          onStatusChange={(status) => onStatusChange(task.id, status)}
-        />
+          <TaskStatusDropdown
+            status={task.status}
+            onStatusChange={(status) => onStatusChange(task.id, status)}
+          />
+        </div>
       </div>
     </div>
   )
