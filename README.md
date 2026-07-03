@@ -160,4 +160,4 @@ On deploy, run `prisma db push` or `prisma migrate deploy` against your producti
 - **Rate limiting and AI cost controls** — Throttle `/api/ai/suggest` per user to prevent abuse
 - **Offline / error recovery** — Retry queues and clearer conflict handling for failed optimistic updates
 - **Accessibility audit** — Full keyboard navigation for board DnD and screen-reader labels on drag overlays
-- **SEO** — Richer metadata (Open Graph, Twitter cards), structured data, and per-route titles/descriptions for better discoverability and link previews
+- **SEO & Domain** — Richer metadata (Open Graph, Twitter cards), structured data, and per-route titles/descriptions for better discoverability and link previews and A dedicated domain for better brandings.
