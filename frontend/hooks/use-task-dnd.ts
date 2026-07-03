@@ -11,7 +11,8 @@ import {
   type UniqueIdentifier,
 } from "@dnd-kit/core"
 
-import { STATUS_ORDER } from "@/lib/tasks/constants"
+import { STATUS_ORDER, isManualTaskOrder } from "@/lib/tasks/constants"
+import type { TaskOrderBy } from "@/lib/tasks/constants"
 import { isSameTaskId } from "@/lib/tasks/types"
 import { findTaskContainer } from "@/lib/tasks/utils"
 import type {
@@ -24,12 +25,23 @@ import type {
 } from "@/lib/tasks/types"
 
 type UseTaskDndOptions<TTask extends Task = Task> = {
-  tasks: TTask[]
+  displayedTasksByStatus: Record<TaskStatus, TTask[]>
+  orderBy: TaskOrderBy
   onUpdateTask: (taskId: TaskId, updates: UpdateTaskInput) => void
+  onReorderWithinStatus: (
+    status: TaskStatus,
+    fromIndex: number,
+    toIndex: number
+  ) => void
+  onMoveAcrossStatus: (
+    taskId: TaskId,
+    fromStatus: TaskStatus,
+    toStatus: TaskStatus,
+    toIndex: number
+  ) => void
 }
 
-type UseTaskDndReturn<TTask extends Task = Task> = {
-  tasksByStatus: Record<TaskStatus, TTask[]>
+type UseTaskDndReturn = {
   sortableIds: UniqueIdentifier[]
   sensors: ReturnType<typeof useSensors>
   handleDragEnd: (event: DragEndEvent) => void
@@ -37,44 +49,35 @@ type UseTaskDndReturn<TTask extends Task = Task> = {
   updateTaskStatus: TaskStatusChangeHandler
 }
 
-function createEmptyGroupedTasks<TTask extends Task>(): Record<TaskStatus, TTask[]> {
-  return STATUS_ORDER.reduce<Record<TaskStatus, TTask[]>>(
-    (acc, status) => {
-      acc[status] = []
-      return acc
-    },
-    {} as Record<TaskStatus, TTask[]>
+function resolveInsertIndex<TTask extends Task>(
+  overId: string | number,
+  containerTasks: TTask[]
+): number {
+  const overIndex = containerTasks.findIndex((task) =>
+    isSameTaskId(overId, task.id)
   )
-}
 
-function groupTasksByStatus<TTask extends Task>(
-  tasks: TTask[]
-): Record<TaskStatus, TTask[]> {
-  const grouped = createEmptyGroupedTasks<TTask>()
-
-  for (const task of tasks) {
-    grouped[task.status].push(task)
+  if (overIndex !== -1) {
+    return overIndex
   }
 
-  return grouped
+  return containerTasks.length
 }
 
-/** Manages grouped task display and drag-and-drop against server-backed task data. */
+/** Manages drag-and-drop using the currently displayed task order. */
 export function useTaskDnd<TTask extends Task = Task>({
-  tasks,
+  displayedTasksByStatus,
+  orderBy,
   onUpdateTask,
-}: UseTaskDndOptions<TTask>): UseTaskDndReturn<TTask> {
-  const tasksByStatus = React.useMemo(
-    () => groupTasksByStatus(tasks),
-    [tasks]
-  )
-
+  onReorderWithinStatus,
+  onMoveAcrossStatus,
+}: UseTaskDndOptions<TTask>): UseTaskDndReturn {
   const sortableIds = React.useMemo<UniqueIdentifier[]>(
     () =>
       STATUS_ORDER.flatMap((status) =>
-        tasksByStatus[status].map((task) => task.id)
+        displayedTasksByStatus[status].map((task) => task.id)
       ),
-    [tasksByStatus]
+    [displayedTasksByStatus]
   )
 
   const sensors = useSensors(
@@ -86,24 +89,59 @@ export function useTaskDnd<TTask extends Task = Task>({
   const handleDragEnd = React.useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event
-      if (!over || active.id === over.id) return
+      if (!over) return
 
-      const activeContainer = findTaskContainer(active.id, tasksByStatus)
-      const overContainer = findTaskContainer(over.id, tasksByStatus)
+      const activeContainer = findTaskContainer(active.id, displayedTasksByStatus)
+      const overContainer = findTaskContainer(over.id, displayedTasksByStatus)
 
       if (!activeContainer || !overContainer) return
 
-      const activeTask = tasksByStatus[activeContainer].find((task) =>
+      const activeTask = displayedTasksByStatus[activeContainer].find((task) =>
         isSameTaskId(active.id, task.id)
       )
 
       if (!activeTask) return
 
-      if (activeContainer !== overContainer) {
-        onUpdateTask(activeTask.id, { status: overContainer })
+      if (activeContainer === overContainer) {
+        if (!isManualTaskOrder(orderBy)) {
+          return
+        }
+
+        if (active.id === over.id) return
+
+        const activeIndex = displayedTasksByStatus[activeContainer].findIndex(
+          (task) => isSameTaskId(active.id, task.id)
+        )
+        const overIndex = displayedTasksByStatus[activeContainer].findIndex(
+          (task) => isSameTaskId(over.id, task.id)
+        )
+
+        if (activeIndex === -1 || overIndex === -1 || activeIndex === overIndex) {
+          return
+        }
+
+        onReorderWithinStatus(activeContainer, activeIndex, overIndex)
+        return
       }
+
+      const targetTasks = displayedTasksByStatus[overContainer]
+      const insertIndex = resolveInsertIndex(over.id, targetTasks)
+
+      onMoveAcrossStatus(
+        activeTask.id,
+        activeContainer,
+        overContainer,
+        insertIndex
+      )
+      onUpdateTask(activeTask.id, { status: overContainer })
     },
-    [onUpdateTask, tasksByStatus]
+    [
+      displayedTasksByStatus,
+      orderBy,
+      onMoveAcrossStatus,
+      onReorderWithinStatus,
+      onUpdateTask,
+    ]
   )
 
   const updateTaskPriority = React.useCallback<TaskPriorityChangeHandler>(
@@ -121,7 +159,6 @@ export function useTaskDnd<TTask extends Task = Task>({
   )
 
   return {
-    tasksByStatus,
     sortableIds,
     sensors,
     handleDragEnd,
