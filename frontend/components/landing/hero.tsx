@@ -51,7 +51,13 @@ export function LandingHero() {
                       size="lg"
                       variant="outline"
                       className="pl-5"
-                      onClick={() => router.push("/dashboard")}
+                      onClick={() =>
+                        window.open(
+                          "https://youtu.be/HUSeRvQNJUE",
+                          "_blank",
+                          "noopener,noreferrer"
+                        )
+                      }
                     >
                       <HugeiconsIcon icon={Play} strokeWidth={2} className="size-3.5" />
                       <span className="text-nowrap">View demo</span>
