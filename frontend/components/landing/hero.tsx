@@ -53,7 +53,7 @@ export function LandingHero() {
                       className="pl-5"
                       onClick={() =>
                         window.open(
-                          "https://youtu.be/HUSeRvQNJUE",
+                          "https://youtu.be/FbBUreXRId4",
                           "_blank",
                           "noopener,noreferrer"
                         )
