@@ -37,7 +37,6 @@ import {
 import type { Task, TaskId, TaskStatus } from "@/lib/tasks/types"
 import {
   buildTaskFormValues,
-  DEFAULT_TASK_FORM_VALUES,
   formValuesToCreateInput,
   taskToFormValues,
   TOOLBAR_CREATE_DEFAULTS,
@@ -248,7 +247,9 @@ export function TaskList() {
         mode={modalState.open ? modalState.mode : "create"}
         teamName={activeTeamName}
         initialValues={
-          modalState.open ? modalState.initialValues : DEFAULT_TASK_FORM_VALUES
+          modalState.open
+            ? modalState.initialValues
+            : buildTaskFormValues()
         }
         taskId={
           modalState.open && modalState.mode === "edit"

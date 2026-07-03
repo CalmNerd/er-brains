@@ -2,8 +2,13 @@ import type { Task } from "@prisma/client";
 
 import type { TaskDto } from "./task.validation.js";
 
+/** Serializes a UTC-midnight Date to YYYY-MM-DD without local timezone drift. */
 function formatDueDate(date: Date): string {
-  return date.toISOString().slice(0, 10);
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
 }
 
 export function toTaskDto(task: Task): TaskDto {

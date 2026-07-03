@@ -1,3 +1,4 @@
+import { getLocalCalendarDate } from "@/lib/dates/calendar-date"
 import type { CreateTaskInput, Task, TaskId } from "@/lib/tasks/types"
 
 export type TaskFormValues = {
@@ -6,14 +7,6 @@ export type TaskFormValues = {
   status: CreateTaskInput["status"]
   priority: CreateTaskInput["priority"]
   dueDate: string
-}
-
-export const DEFAULT_TASK_FORM_VALUES: TaskFormValues = {
-  title: "",
-  description: "",
-  status: "To Do",
-  priority: "Low",
-  dueDate: new Date().toISOString().slice(0, 10),
 }
 
 export const TOOLBAR_CREATE_DEFAULTS: Partial<TaskFormValues> = {
@@ -25,7 +18,11 @@ export function buildTaskFormValues(
   overrides?: Partial<TaskFormValues>
 ): TaskFormValues {
   return {
-    ...DEFAULT_TASK_FORM_VALUES,
+    title: "",
+    description: "",
+    status: "To Do",
+    priority: "Low",
+    dueDate: getLocalCalendarDate(),
     ...overrides,
   }
 }
