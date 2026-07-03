@@ -11,7 +11,9 @@ export type TaskView = "all" | "active"
 
 export type TaskLayout = "list" | "board"
 
-export type TaskOrderBy = "status" | "priority"
+export type TaskOrderBy = "status" | "priority" | "dueDate"
+
+export type TaskSortDirection = "asc" | "desc"
 
 export const TASK_LAYOUT_OPTIONS: { value: TaskLayout; label: string }[] = [
   { value: "list", label: "List" },
@@ -21,16 +23,45 @@ export const TASK_LAYOUT_OPTIONS: { value: TaskLayout; label: string }[] = [
 export const TASK_ORDER_OPTIONS: { value: TaskOrderBy; label: string }[] = [
   { value: "status", label: "Status" },
   { value: "priority", label: "Priority" },
+  { value: "dueDate", label: "Due date" },
+]
+
+export const TASK_SORT_DIRECTION_OPTIONS: {
+  value: TaskSortDirection
+  label: string
+}[] = [
+  { value: "asc", label: "Asc" },
+  { value: "desc", label: "Desc" },
 ]
 
 export const DEFAULT_TASK_FILTERS = {
   view: "all",
   layout: "list",
   orderBy: "status",
+  sortDirection: "asc",
 } as const satisfies {
   view: TaskView
   layout: TaskLayout
   orderBy: TaskOrderBy
+  sortDirection: TaskSortDirection
+}
+
+/** Manual drag-and-drop is only available when ordering by status. */
+export function isManualTaskOrder(orderBy: TaskOrderBy): boolean {
+  return orderBy === "status"
+}
+
+/** Column hint shown when automatic sorting disables drag-and-drop. */
+export function getOrderByColumnLabel(orderBy: TaskOrderBy): string | null {
+  if (orderBy === "priority") {
+    return "Ordered by priority"
+  }
+
+  if (orderBy === "dueDate") {
+    return "Ordered by due date"
+  }
+
+  return null
 }
 
 export const STATUS_CONFIG: Record<

@@ -8,6 +8,7 @@ import {
   DEFAULT_TASK_FILTERS,
   type TaskLayout,
   type TaskOrderBy,
+  type TaskSortDirection,
   type TaskView,
 } from "@/lib/tasks/constants"
 
@@ -15,10 +16,12 @@ type TaskUiState = {
   view: TaskView
   layout: TaskLayout
   orderBy: TaskOrderBy
+  sortDirection: TaskSortDirection
   modalState: OpenTaskModalState
   setView: (view: TaskView) => void
   setLayout: (layout: TaskLayout) => void
   setOrderBy: (orderBy: TaskOrderBy) => void
+  setSortDirection: (sortDirection: TaskSortDirection) => void
   resetFilters: () => void
   setModalState: (modalState: OpenTaskModalState) => void
   closeModal: () => void
@@ -29,15 +32,18 @@ export const useTaskUiStore = create<TaskUiState>((set) => ({
   view: DEFAULT_TASK_FILTERS.view,
   layout: DEFAULT_TASK_FILTERS.layout,
   orderBy: DEFAULT_TASK_FILTERS.orderBy,
+  sortDirection: DEFAULT_TASK_FILTERS.sortDirection,
   modalState: CLOSED_TASK_MODAL_STATE,
   setView: (view) => set({ view }),
   setLayout: (layout) => set({ layout }),
   setOrderBy: (orderBy) => set({ orderBy }),
+  setSortDirection: (sortDirection) => set({ sortDirection }),
   resetFilters: () =>
     set({
       view: DEFAULT_TASK_FILTERS.view,
       layout: DEFAULT_TASK_FILTERS.layout,
       orderBy: DEFAULT_TASK_FILTERS.orderBy,
+      sortDirection: DEFAULT_TASK_FILTERS.sortDirection,
     }),
   setModalState: (modalState) => set({ modalState }),
   closeModal: () => set({ modalState: CLOSED_TASK_MODAL_STATE }),
@@ -46,6 +52,7 @@ export const useTaskUiStore = create<TaskUiState>((set) => ({
       view: DEFAULT_TASK_FILTERS.view,
       layout: DEFAULT_TASK_FILTERS.layout,
       orderBy: DEFAULT_TASK_FILTERS.orderBy,
+      sortDirection: DEFAULT_TASK_FILTERS.sortDirection,
       modalState: CLOSED_TASK_MODAL_STATE,
     }),
 }))
