@@ -11,7 +11,7 @@ export async function pingBackendHealth(): Promise<boolean> {
   const timeoutId = setTimeout(() => controller.abort(), HEALTH_CHECK_TIMEOUT_MS)
 
   try {
-    const response = await fetch(`${API_BASE_URL}/health`, {
+    const response = await fetch(`${API_BASE_URL}/api/ping`, {
       signal: controller.signal,
       cache: "no-store",
     })

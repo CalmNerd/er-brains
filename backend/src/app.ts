@@ -20,7 +20,7 @@ export function createApp() {
   );
   app.use(express.json());
 
-  app.use("/health", healthRouter);
+  app.use("/api/ping", healthRouter);
   app.use("/api/auth", authRouter);
   app.use("/api/teams", teamRouter);
   app.use("/api/tasks", taskRouter);
