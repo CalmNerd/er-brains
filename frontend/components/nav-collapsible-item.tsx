@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Delete02Icon, Edit02Icon, Tick02Icon } from "@hugeicons/core-free-icons"
 
@@ -31,9 +31,10 @@ export function NavCollapsibleItemRow({
   onDelete,
 }: NavCollapsibleItemRowProps) {
   const inputRef = useRef<HTMLInputElement>(null)
+  const [editTitle, setEditTitle] = useState(item.title)
 
   const commitRename = () => {
-    onRename(inputRef.current?.value ?? "")
+    onRename(editTitle)
   }
 
   useEffect(() => {
@@ -41,9 +42,10 @@ export function NavCollapsibleItemRow({
       return
     }
 
+    setEditTitle(item.title)
     inputRef.current?.focus()
     inputRef.current?.select()
-  }, [isEditing])
+  }, [isEditing, item.title])
 
   if (isEditing) {
     return (
@@ -51,11 +53,12 @@ export function NavCollapsibleItemRow({
         <div className="mb-[1px] flex h-8 items-center gap-0.5 rounded-md bg-sidebar-accent px-2 ring-sidebar-ring outline-hidden focus-within:ring-2">
           <Input
             ref={inputRef}
-            defaultValue={item.title}
+            value={editTitle}
+            onChange={(event) => setEditTitle(event.target.value)}
             placeholder="Team name"
             aria-label="Team name"
             className="h-6 min-w-0 flex-1 border-0 bg-transparent px-0 text-sm shadow-none focus-visible:border-transparent focus-visible:ring-0"
-            onBlur={(event) => onRename(event.currentTarget.value)}
+            onBlur={commitRename}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
                 event.preventDefault()
