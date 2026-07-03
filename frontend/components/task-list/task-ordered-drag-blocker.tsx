@@ -1,19 +1,19 @@
-import { getOrderByColumnLabel, type TaskOrderBy } from "@/lib/tasks/constants"
+import { getSortByColumnLabel, type TaskSortBy } from "@/lib/tasks/constants"
 import { cn } from "@/lib/utils"
 
 type TaskOrderedDragBlockerProps = {
-  orderBy: TaskOrderBy
+  sortBy: TaskSortBy
   visible: boolean
   className?: string
 }
 
 /** Section overlay shown while reordering within a sorted status bucket. */
 export function TaskOrderedDragBlocker({
-  orderBy,
+  sortBy,
   visible,
   className,
 }: TaskOrderedDragBlockerProps) {
-  const label = getOrderByColumnLabel(orderBy)
+  const label = getSortByColumnLabel(sortBy)
 
   if (!visible || !label) {
     return null

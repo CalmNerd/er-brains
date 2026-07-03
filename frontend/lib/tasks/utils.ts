@@ -4,7 +4,7 @@ import {
   parseCalendarDate,
 } from "@/lib/dates/calendar-date"
 import { STATUS_ORDER } from "@/lib/tasks/constants"
-import type { TaskOrderBy, TaskSortDirection } from "@/lib/tasks/constants"
+import type { TaskOrdering, TaskSortBy } from "@/lib/tasks/constants"
 import { isSameTaskId, isTaskStatus } from "@/lib/tasks/schema"
 import type { Task, TaskId, TaskPriority, TaskStatus } from "@/lib/tasks/types"
 
@@ -28,16 +28,16 @@ function createEmptyManualOrder(): Record<TaskStatus, TaskId[]> {
 /** Sorts tasks within a group. Status mode preserves caller order (manual). */
 export function sortTasksByOrder<TTask extends Task>(
   tasks: TTask[],
-  orderBy: TaskOrderBy,
-  sortDirection: TaskSortDirection
+  sortBy: TaskSortBy,
+  ordering: TaskOrdering
 ): TTask[] {
-  if (orderBy === "status") {
+  if (sortBy === "status") {
     return [...tasks]
   }
 
-  const direction = sortDirection === "asc" ? 1 : -1
+  const direction = ordering === "asc" ? 1 : -1
 
-  if (orderBy === "priority") {
+  if (sortBy === "priority") {
     return [...tasks].sort(
       (a, b) =>
         direction * (PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority])
@@ -55,12 +55,12 @@ export function sortTasksByOrder<TTask extends Task>(
 /** Applies ordering to each status bucket without mutating the source. */
 export function applyOrderToGrouped<TTask extends Task>(
   grouped: Record<TaskStatus, TTask[]>,
-  orderBy: TaskOrderBy,
-  sortDirection: TaskSortDirection
+  sortBy: TaskSortBy,
+  ordering: TaskOrdering
 ): Record<TaskStatus, TTask[]> {
   return STATUS_ORDER.reduce<Record<TaskStatus, TTask[]>>(
     (acc, status) => {
-      acc[status] = sortTasksByOrder(grouped[status], orderBy, sortDirection)
+      acc[status] = sortTasksByOrder(grouped[status], sortBy, ordering)
       return acc
     },
     {} as Record<TaskStatus, TTask[]>

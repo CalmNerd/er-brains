@@ -28,7 +28,7 @@ import { useTasks } from "@/hooks/queries/use-tasks"
 import { useTaskDnd } from "@/hooks/use-task-dnd"
 import {
   ACTIVE_STATUSES,
-  isManualTaskOrder,
+  isManualSortBy,
   STATUS_ORDER,
 } from "@/lib/tasks/constants"
 import {
@@ -88,12 +88,12 @@ export function TaskList() {
   const sortableId = React.useId()
   const view = useTaskUiStore((state) => state.view)
   const layout = useTaskUiStore((state) => state.layout)
-  const orderBy = useTaskUiStore((state) => state.orderBy)
-  const sortDirection = useTaskUiStore((state) => state.sortDirection)
+  const sortBy = useTaskUiStore((state) => state.sortBy)
+  const ordering = useTaskUiStore((state) => state.ordering)
   const setView = useTaskUiStore((state) => state.setView)
   const setLayout = useTaskUiStore((state) => state.setLayout)
-  const setOrderBy = useTaskUiStore((state) => state.setOrderBy)
-  const setSortDirection = useTaskUiStore((state) => state.setSortDirection)
+  const setSortBy = useTaskUiStore((state) => state.setSortBy)
+  const setOrdering = useTaskUiStore((state) => state.setOrdering)
   const resetFilters = useTaskUiStore((state) => state.resetFilters)
   const modalState = useTaskUiStore((state) => state.modalState)
   const setModalState = useTaskUiStore((state) => state.setModalState)
@@ -137,12 +137,12 @@ export function TaskList() {
   const tasksByStatus = React.useMemo(() => groupTasksByStatus(tasks), [tasks])
 
   const orderedTasksByStatus = React.useMemo(() => {
-    if (isManualTaskOrder(orderBy)) {
+    if (isManualSortBy(sortBy)) {
       return applyManualOrderToGrouped(tasksByStatus, manualOrder)
     }
 
-    return applyOrderToGrouped(tasksByStatus, orderBy, sortDirection)
-  }, [tasksByStatus, manualOrder, orderBy, sortDirection])
+    return applyOrderToGrouped(tasksByStatus, sortBy, ordering)
+  }, [tasksByStatus, manualOrder, sortBy, ordering])
 
   const {
     sortableIds,
@@ -152,7 +152,7 @@ export function TaskList() {
     updateTaskStatus,
   } = useTaskDnd({
     displayedTasksByStatus: orderedTasksByStatus,
-    orderBy,
+    sortBy,
     onUpdateTask: handleSilentUpdate,
     onReorderWithinStatus: reorderWithinStatus,
     onMoveAcrossStatus: moveAcrossStatus,
@@ -163,8 +163,8 @@ export function TaskList() {
   const activeDragStatus = activeTask?.status ?? null
 
   const filters = React.useMemo(
-    () => ({ view, layout, orderBy, sortDirection }),
-    [view, layout, orderBy, sortDirection]
+    () => ({ view, layout, sortBy, ordering }),
+    [view, layout, sortBy, ordering]
   )
 
   const visibleStatuses = React.useMemo<readonly TaskStatus[]>(
@@ -259,8 +259,8 @@ export function TaskList() {
         filters={filters}
         onViewChange={setView}
         onLayoutChange={setLayout}
-        onOrderByChange={setOrderBy}
-        onSortDirectionChange={setSortDirection}
+        onSortByChange={setSortBy}
+        onOrderingChange={setOrdering}
         onResetFilters={resetFilters}
         onCreateTask={() => openCreateModal(TOOLBAR_CREATE_DEFAULTS)}
       />
@@ -314,7 +314,7 @@ export function TaskList() {
               <TaskListView
                 visibleStatuses={visibleStatuses}
                 tasksByStatus={orderedTasksByStatus}
-                orderBy={orderBy}
+                sortBy={sortBy}
                 activeDragStatus={activeDragStatus}
                 onPriorityChange={updateTaskPriority}
                 onStatusChange={updateTaskStatus}
@@ -325,7 +325,7 @@ export function TaskList() {
               <TaskBoardView
                 visibleStatuses={visibleStatuses}
                 tasksByStatus={orderedTasksByStatus}
-                orderBy={orderBy}
+                sortBy={sortBy}
                 activeDragStatus={activeDragStatus}
                 onPriorityChange={updateTaskPriority}
                 onStatusChange={updateTaskStatus}

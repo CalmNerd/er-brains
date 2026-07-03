@@ -11,23 +11,23 @@ export type TaskView = "all" | "active"
 
 export type TaskLayout = "list" | "board"
 
-export type TaskOrderBy = "status" | "priority" | "dueDate"
+export type TaskSortBy = "status" | "priority" | "dueDate"
 
-export type TaskSortDirection = "asc" | "desc"
+export type TaskOrdering = "asc" | "desc"
 
 export const TASK_LAYOUT_OPTIONS: { value: TaskLayout; label: string }[] = [
   { value: "list", label: "List" },
   { value: "board", label: "Board" },
 ]
 
-export const TASK_ORDER_OPTIONS: { value: TaskOrderBy; label: string }[] = [
+export const TASK_SORT_BY_OPTIONS: { value: TaskSortBy; label: string }[] = [
   { value: "status", label: "Status" },
   { value: "priority", label: "Priority" },
   { value: "dueDate", label: "Due date" },
 ]
 
-export const TASK_SORT_DIRECTION_OPTIONS: {
-  value: TaskSortDirection
+export const TASK_ORDERING_OPTIONS: {
+  value: TaskOrdering
   label: string
 }[] = [
   { value: "asc", label: "Asc" },
@@ -37,27 +37,27 @@ export const TASK_SORT_DIRECTION_OPTIONS: {
 export const DEFAULT_TASK_FILTERS = {
   view: "all",
   layout: "list",
-  orderBy: "status",
-  sortDirection: "asc",
+  sortBy: "status",
+  ordering: "asc",
 } as const satisfies {
   view: TaskView
   layout: TaskLayout
-  orderBy: TaskOrderBy
-  sortDirection: TaskSortDirection
+  sortBy: TaskSortBy
+  ordering: TaskOrdering
 }
 
-/** Manual drag-and-drop is only available when ordering by status. */
-export function isManualTaskOrder(orderBy: TaskOrderBy): boolean {
-  return orderBy === "status"
+/** Manual drag-and-drop is only available when sorting by status. */
+export function isManualSortBy(sortBy: TaskSortBy): boolean {
+  return sortBy === "status"
 }
 
-/** Column hint shown when automatic sorting disables drag-and-drop. */
-export function getOrderByColumnLabel(orderBy: TaskOrderBy): string | null {
-  if (orderBy === "priority") {
+/** Column hint shown when automatic sorting disables within-section reorder. */
+export function getSortByColumnLabel(sortBy: TaskSortBy): string | null {
+  if (sortBy === "priority") {
     return "Ordered by priority"
   }
 
-  if (orderBy === "dueDate") {
+  if (sortBy === "dueDate") {
     return "Ordered by due date"
   }
 

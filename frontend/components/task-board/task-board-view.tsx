@@ -1,13 +1,13 @@
 "use client"
 
 import { TaskBoardColumn } from "@/components/task-board/task-board-column"
-import type { TaskOrderBy } from "@/lib/tasks/constants"
+import type { TaskSortBy } from "@/lib/tasks/constants"
 import type { Task, TaskStatus, TaskUpdateHandlers } from "@/lib/tasks/types"
 
 type TaskBoardViewProps = {
   visibleStatuses: readonly TaskStatus[]
   tasksByStatus: Record<TaskStatus, Task[]>
-  orderBy: TaskOrderBy
+  sortBy: TaskSortBy
   activeDragStatus: TaskStatus | null
   onTaskClick: (task: Task) => void
   onAddTask: (status: TaskStatus) => void
@@ -16,7 +16,7 @@ type TaskBoardViewProps = {
 export function TaskBoardView({
   visibleStatuses,
   tasksByStatus,
-  orderBy,
+  sortBy,
   activeDragStatus,
   onPriorityChange,
   onStatusChange,
@@ -30,7 +30,7 @@ export function TaskBoardView({
           key={status}
           status={status}
           tasks={tasksByStatus[status]}
-          orderBy={orderBy}
+          sortBy={sortBy}
           activeDragStatus={activeDragStatus}
           onPriorityChange={onPriorityChange}
           onStatusChange={onStatusChange}

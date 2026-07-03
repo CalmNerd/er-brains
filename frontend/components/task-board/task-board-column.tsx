@@ -9,14 +9,14 @@ import { TaskBoardCard } from "@/components/task-board/task-board-card"
 import { TaskOrderedDragBlocker } from "@/components/task-list/task-ordered-drag-blocker"
 import { TaskStatusIcon } from "@/components/task-list/task-status-icon"
 import { Button } from "@/components/ui/button"
-import { isManualTaskOrder, STATUS_CONFIG, type TaskOrderBy } from "@/lib/tasks/constants"
+import { isManualSortBy, STATUS_CONFIG, type TaskSortBy } from "@/lib/tasks/constants"
 import type { Task, TaskStatus, TaskUpdateHandlers } from "@/lib/tasks/types"
 import { cn } from "@/lib/utils"
 
 type TaskBoardColumnProps = {
   status: TaskStatus
   tasks: Task[]
-  orderBy: TaskOrderBy
+  sortBy: TaskSortBy
   activeDragStatus: TaskStatus | null
   onTaskClick: (task: Task) => void
   onAddTask: (status: TaskStatus) => void
@@ -25,7 +25,7 @@ type TaskBoardColumnProps = {
 export function TaskBoardColumn({
   status,
   tasks,
-  orderBy,
+  sortBy,
   activeDragStatus,
   onPriorityChange,
   onStatusChange,
@@ -35,7 +35,7 @@ export function TaskBoardColumn({
   const config = STATUS_CONFIG[status]
   const taskIds = tasks.map((task) => task.id)
   const showOrderedDragBlocker =
-    activeDragStatus === status && !isManualTaskOrder(orderBy)
+    activeDragStatus === status && !isManualSortBy(sortBy)
   const { setNodeRef, isOver } = useDroppable({ id: status })
 
   return (
@@ -64,7 +64,7 @@ export function TaskBoardColumn({
         )}
       >
         <TaskOrderedDragBlocker
-          orderBy={orderBy}
+          sortBy={sortBy}
           visible={showOrderedDragBlocker}
         />
         <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>

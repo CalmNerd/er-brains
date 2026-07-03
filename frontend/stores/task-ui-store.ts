@@ -7,21 +7,21 @@ import {
 import {
   DEFAULT_TASK_FILTERS,
   type TaskLayout,
-  type TaskOrderBy,
-  type TaskSortDirection,
+  type TaskOrdering,
+  type TaskSortBy,
   type TaskView,
 } from "@/lib/tasks/constants"
 
 type TaskUiState = {
   view: TaskView
   layout: TaskLayout
-  orderBy: TaskOrderBy
-  sortDirection: TaskSortDirection
+  sortBy: TaskSortBy
+  ordering: TaskOrdering
   modalState: OpenTaskModalState
   setView: (view: TaskView) => void
   setLayout: (layout: TaskLayout) => void
-  setOrderBy: (orderBy: TaskOrderBy) => void
-  setSortDirection: (sortDirection: TaskSortDirection) => void
+  setSortBy: (sortBy: TaskSortBy) => void
+  setOrdering: (ordering: TaskOrdering) => void
   resetFilters: () => void
   setModalState: (modalState: OpenTaskModalState) => void
   closeModal: () => void
@@ -31,19 +31,19 @@ type TaskUiState = {
 export const useTaskUiStore = create<TaskUiState>((set) => ({
   view: DEFAULT_TASK_FILTERS.view,
   layout: DEFAULT_TASK_FILTERS.layout,
-  orderBy: DEFAULT_TASK_FILTERS.orderBy,
-  sortDirection: DEFAULT_TASK_FILTERS.sortDirection,
+  sortBy: DEFAULT_TASK_FILTERS.sortBy,
+  ordering: DEFAULT_TASK_FILTERS.ordering,
   modalState: CLOSED_TASK_MODAL_STATE,
   setView: (view) => set({ view }),
   setLayout: (layout) => set({ layout }),
-  setOrderBy: (orderBy) => set({ orderBy }),
-  setSortDirection: (sortDirection) => set({ sortDirection }),
+  setSortBy: (sortBy) => set({ sortBy }),
+  setOrdering: (ordering) => set({ ordering }),
   resetFilters: () =>
     set({
       view: DEFAULT_TASK_FILTERS.view,
       layout: DEFAULT_TASK_FILTERS.layout,
-      orderBy: DEFAULT_TASK_FILTERS.orderBy,
-      sortDirection: DEFAULT_TASK_FILTERS.sortDirection,
+      sortBy: DEFAULT_TASK_FILTERS.sortBy,
+      ordering: DEFAULT_TASK_FILTERS.ordering,
     }),
   setModalState: (modalState) => set({ modalState }),
   closeModal: () => set({ modalState: CLOSED_TASK_MODAL_STATE }),
@@ -51,8 +51,8 @@ export const useTaskUiStore = create<TaskUiState>((set) => ({
     set({
       view: DEFAULT_TASK_FILTERS.view,
       layout: DEFAULT_TASK_FILTERS.layout,
-      orderBy: DEFAULT_TASK_FILTERS.orderBy,
-      sortDirection: DEFAULT_TASK_FILTERS.sortDirection,
+      sortBy: DEFAULT_TASK_FILTERS.sortBy,
+      ordering: DEFAULT_TASK_FILTERS.ordering,
       modalState: CLOSED_TASK_MODAL_STATE,
     }),
 }))

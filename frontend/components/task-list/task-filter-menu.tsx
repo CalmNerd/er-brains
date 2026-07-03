@@ -25,13 +25,13 @@ import {
 } from "@/components/ui/select"
 import {
   DEFAULT_TASK_FILTERS,
-  isManualTaskOrder,
+  isManualSortBy,
   TASK_LAYOUT_OPTIONS,
-  TASK_ORDER_OPTIONS,
-  TASK_SORT_DIRECTION_OPTIONS,
+  TASK_ORDERING_OPTIONS,
+  TASK_SORT_BY_OPTIONS,
   type TaskLayout,
-  type TaskOrderBy,
-  type TaskSortDirection,
+  type TaskOrdering,
+  type TaskSortBy,
   type TaskView,
 } from "@/lib/tasks/constants"
 import { cn } from "@/lib/utils"
@@ -39,15 +39,15 @@ import { cn } from "@/lib/utils"
 export type TaskFilters = {
   view: TaskView
   layout: TaskLayout
-  orderBy: TaskOrderBy
-  sortDirection: TaskSortDirection
+  sortBy: TaskSortBy
+  ordering: TaskOrdering
 }
 
 type TaskFilterMenuProps = {
   filters: TaskFilters
   onLayoutChange: (layout: TaskLayout) => void
-  onOrderByChange: (orderBy: TaskOrderBy) => void
-  onSortDirectionChange: (sortDirection: TaskSortDirection) => void
+  onSortByChange: (sortBy: TaskSortBy) => void
+  onOrderingChange: (ordering: TaskOrdering) => void
   onReset: () => void
 }
 
@@ -56,7 +56,7 @@ const LAYOUT_ICONS = {
   board: KanbanIcon,
 } as const
 
-/** Prevents the parent dropdown from closing when interacting with the order select. */
+/** Prevents the parent dropdown from closing when interacting with nested selects. */
 function stopMenuClose(event: React.PointerEvent) {
   event.stopPropagation()
 }
@@ -64,17 +64,17 @@ function stopMenuClose(event: React.PointerEvent) {
 export function TaskFilterMenu({
   filters,
   onLayoutChange,
-  onOrderByChange,
-  onSortDirectionChange,
+  onSortByChange,
+  onOrderingChange,
   onReset,
 }: TaskFilterMenuProps) {
   const isDirty =
     filters.view !== DEFAULT_TASK_FILTERS.view ||
     filters.layout !== DEFAULT_TASK_FILTERS.layout ||
-    filters.orderBy !== DEFAULT_TASK_FILTERS.orderBy ||
-    filters.sortDirection !== DEFAULT_TASK_FILTERS.sortDirection
+    filters.sortBy !== DEFAULT_TASK_FILTERS.sortBy ||
+    filters.ordering !== DEFAULT_TASK_FILTERS.ordering
 
-  const isSortDirectionEnabled = !isManualTaskOrder(filters.orderBy)
+  const isOrderingEnabled = !isManualSortBy(filters.sortBy)
 
   return (
     <DropdownMenu>
@@ -126,20 +126,20 @@ export function TaskFilterMenu({
 
         <div className="flex items-center justify-between gap-3 p-2">
           <Label className="text-xs font-normal text-muted-foreground">
-            Ordering
+            Sort by
           </Label>
           <div onPointerDown={stopMenuClose}>
             <Select
-              value={filters.orderBy}
-              onValueChange={(value) => onOrderByChange(value as TaskOrderBy)}
-              items={TASK_ORDER_OPTIONS}
+              value={filters.sortBy}
+              onValueChange={(value) => onSortByChange(value as TaskSortBy)}
+              items={TASK_SORT_BY_OPTIONS}
             >
               <SelectTrigger size="sm" className="w-[120px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent align="end">
                 <SelectGroup>
-                  {TASK_ORDER_OPTIONS.map((option) => (
+                  {TASK_SORT_BY_OPTIONS.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>
@@ -152,27 +152,27 @@ export function TaskFilterMenu({
 
         <div className="flex items-center justify-between gap-3 p-2">
           <Label className="text-xs font-normal text-muted-foreground">
-            Sort by
+            Ordering
           </Label>
           <div onPointerDown={stopMenuClose}>
             <Select
-              value={filters.sortDirection}
+              value={filters.ordering}
               onValueChange={(value) =>
-                onSortDirectionChange(value as TaskSortDirection)
+                onOrderingChange(value as TaskOrdering)
               }
-              items={TASK_SORT_DIRECTION_OPTIONS}
-              disabled={!isSortDirectionEnabled}
+              items={TASK_ORDERING_OPTIONS}
+              disabled={!isOrderingEnabled}
             >
               <SelectTrigger
                 size="sm"
                 className="w-[120px]"
-                disabled={!isSortDirectionEnabled}
+                disabled={!isOrderingEnabled}
               >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent align="end">
                 <SelectGroup>
-                  {TASK_SORT_DIRECTION_OPTIONS.map((option) => (
+                  {TASK_ORDERING_OPTIONS.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>

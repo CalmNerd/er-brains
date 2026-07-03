@@ -11,8 +11,8 @@ import {
   type UniqueIdentifier,
 } from "@dnd-kit/core"
 
-import { STATUS_ORDER, isManualTaskOrder } from "@/lib/tasks/constants"
-import type { TaskOrderBy } from "@/lib/tasks/constants"
+import { STATUS_ORDER, isManualSortBy } from "@/lib/tasks/constants"
+import type { TaskSortBy } from "@/lib/tasks/constants"
 import { isSameTaskId } from "@/lib/tasks/types"
 import { findTaskContainer } from "@/lib/tasks/utils"
 import type {
@@ -26,7 +26,7 @@ import type {
 
 type UseTaskDndOptions<TTask extends Task = Task> = {
   displayedTasksByStatus: Record<TaskStatus, TTask[]>
-  orderBy: TaskOrderBy
+  sortBy: TaskSortBy
   onUpdateTask: (taskId: TaskId, updates: UpdateTaskInput) => void
   onReorderWithinStatus: (
     status: TaskStatus,
@@ -67,7 +67,7 @@ function resolveInsertIndex<TTask extends Task>(
 /** Manages drag-and-drop using the currently displayed task order. */
 export function useTaskDnd<TTask extends Task = Task>({
   displayedTasksByStatus,
-  orderBy,
+  sortBy,
   onUpdateTask,
   onReorderWithinStatus,
   onMoveAcrossStatus,
@@ -103,7 +103,7 @@ export function useTaskDnd<TTask extends Task = Task>({
       if (!activeTask) return
 
       if (activeContainer === overContainer) {
-        if (!isManualTaskOrder(orderBy)) {
+        if (!isManualSortBy(sortBy)) {
           return
         }
 
@@ -137,7 +137,7 @@ export function useTaskDnd<TTask extends Task = Task>({
     },
     [
       displayedTasksByStatus,
-      orderBy,
+      sortBy,
       onMoveAcrossStatus,
       onReorderWithinStatus,
       onUpdateTask,

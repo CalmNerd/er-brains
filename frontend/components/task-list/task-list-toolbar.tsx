@@ -5,15 +5,15 @@ import { Add01Icon } from "@hugeicons/core-free-icons"
 
 import { TaskFilterMenu, type TaskFilters } from "@/components/task-list/task-filter-menu"
 import { Button } from "@/components/ui/button"
-import type { TaskLayout, TaskOrderBy, TaskSortDirection, TaskView } from "@/lib/tasks/constants"
+import type { TaskLayout, TaskOrdering, TaskSortBy, TaskView } from "@/lib/tasks/constants"
 import { cn } from "@/lib/utils"
 
 type TaskListToolbarProps = {
   filters: TaskFilters
   onViewChange: (view: TaskView) => void
   onLayoutChange: (layout: TaskLayout) => void
-  onOrderByChange: (orderBy: TaskOrderBy) => void
-  onSortDirectionChange: (sortDirection: TaskSortDirection) => void
+  onSortByChange: (sortBy: TaskSortBy) => void
+  onOrderingChange: (ordering: TaskOrdering) => void
   onResetFilters: () => void
   onCreateTask: () => void
 }
@@ -27,8 +27,8 @@ export function TaskListToolbar({
   filters,
   onViewChange,
   onLayoutChange,
-  onOrderByChange,
-  onSortDirectionChange,
+  onSortByChange,
+  onOrderingChange,
   onResetFilters,
   onCreateTask,
 }: TaskListToolbarProps) {
@@ -66,8 +66,8 @@ export function TaskListToolbar({
         <TaskFilterMenu
           filters={filters}
           onLayoutChange={onLayoutChange}
-          onOrderByChange={onOrderByChange}
-          onSortDirectionChange={onSortDirectionChange}
+          onSortByChange={onSortByChange}
+          onOrderingChange={onOrderingChange}
           onReset={onResetFilters}
         />
       </div>
