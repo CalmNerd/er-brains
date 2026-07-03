@@ -5,9 +5,9 @@ import { CSS } from "@dnd-kit/utilities"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Time04Icon } from "@hugeicons/core-free-icons"
 
+import { TaskDueDate } from "@/components/task-list/task-due-date"
 import { TaskPriorityDropdown } from "@/components/task-list/task-priority-dropdown"
 import { TaskStatusDropdown } from "@/components/task-list/task-status-dropdown"
-import { formatDueDate } from "@/lib/tasks/utils"
 import type { Task, TaskUpdateHandlers } from "@/lib/tasks/types"
 import { cn } from "@/lib/utils"
 
@@ -74,7 +74,7 @@ export function TaskBoardCard({
             strokeWidth={2}
             className="size-3.5 shrink-0"
           />
-          <span className="truncate">{formatDueDate(task.dueDate)}</span>
+          <TaskDueDate task={task} className="truncate" />
         </div>
 
         <TaskPriorityDropdown

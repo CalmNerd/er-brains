@@ -20,19 +20,23 @@ import { TaskListSkeleton } from "@/components/task-list/task-list-skeleton"
 import { TaskListToolbar } from "@/components/task-list/task-list-toolbar"
 import { TaskListView } from "@/components/task-list/task-list-view"
 import { TaskModal } from "@/components/task-modal/task-modal"
+import { TaskDueDate } from "@/components/task-list/task-due-date"
 import { PriorityIndicator } from "@/components/task-list/priority-indicator"
 import { TaskStatusIcon } from "@/components/task-list/task-status-icon"
+import { useManualTaskOrder } from "@/hooks/use-manual-task-order"
 import { useTasks } from "@/hooks/queries/use-tasks"
 import { useTaskDnd } from "@/hooks/use-task-dnd"
 import {
   ACTIVE_STATUSES,
+  isManualTaskOrder,
   STATUS_ORDER,
 } from "@/lib/tasks/constants"
 import {
+  applyManualOrderToGrouped,
   applyOrderToGrouped,
   findTaskById,
-  formatDueDate,
   formatTaskId,
+  groupTasksByStatus,
 } from "@/lib/tasks/utils"
 import type { Task, TaskId, TaskStatus } from "@/lib/tasks/types"
 import {
@@ -54,9 +58,7 @@ function ListDragOverlay({ task }: { task: Task }) {
       </span>
       <TaskStatusIcon status={task.status} />
       <span className="min-w-0 flex-1 truncate text-sm">{task.title}</span>
-      <span className="shrink-0 text-xs text-muted-foreground">
-        {formatDueDate(task.dueDate)}
-      </span>
+      <TaskDueDate task={task} className="shrink-0" />
     </div>
   )
 }
@@ -73,7 +75,7 @@ function BoardDragOverlay({ task }: { task: Task }) {
       <div className="flex items-center gap-2">
         <div className="flex min-w-0 flex-1 items-center gap-1.5 text-xs text-muted-foreground">
           <HugeiconsIcon icon={Calendar03Icon} strokeWidth={2} className="size-3.5" />
-          <span>{formatDueDate(task.dueDate)}</span>
+          <TaskDueDate task={task} />
         </div>
         <PriorityIndicator priority={task.priority} />
         <TaskStatusIcon status={task.status} />
@@ -87,9 +89,11 @@ export function TaskList() {
   const view = useTaskUiStore((state) => state.view)
   const layout = useTaskUiStore((state) => state.layout)
   const orderBy = useTaskUiStore((state) => state.orderBy)
+  const sortDirection = useTaskUiStore((state) => state.sortDirection)
   const setView = useTaskUiStore((state) => state.setView)
   const setLayout = useTaskUiStore((state) => state.setLayout)
   const setOrderBy = useTaskUiStore((state) => state.setOrderBy)
+  const setSortDirection = useTaskUiStore((state) => state.setSortDirection)
   const resetFilters = useTaskUiStore((state) => state.resetFilters)
   const modalState = useTaskUiStore((state) => state.modalState)
   const setModalState = useTaskUiStore((state) => state.setModalState)
@@ -122,32 +126,50 @@ export function TaskList() {
   )
 
   const {
-    tasksByStatus,
+    manualOrder,
+    reorderWithinStatus,
+    moveAcrossStatus,
+  } = useManualTaskOrder({
+    teamId: selectedTeamId,
+    tasks,
+  })
+
+  const tasksByStatus = React.useMemo(() => groupTasksByStatus(tasks), [tasks])
+
+  const orderedTasksByStatus = React.useMemo(() => {
+    if (isManualTaskOrder(orderBy)) {
+      return applyManualOrderToGrouped(tasksByStatus, manualOrder)
+    }
+
+    return applyOrderToGrouped(tasksByStatus, orderBy, sortDirection)
+  }, [tasksByStatus, manualOrder, orderBy, sortDirection])
+
+  const {
     sortableIds,
     sensors,
     handleDragEnd,
     updateTaskPriority,
     updateTaskStatus,
   } = useTaskDnd({
-    tasks,
+    displayedTasksByStatus: orderedTasksByStatus,
+    orderBy,
     onUpdateTask: handleSilentUpdate,
+    onReorderWithinStatus: reorderWithinStatus,
+    onMoveAcrossStatus: moveAcrossStatus,
   })
 
   const [activeTask, setActiveTask] = React.useState<Task | null>(null)
 
+  const activeDragStatus = activeTask?.status ?? null
+
   const filters = React.useMemo(
-    () => ({ view, layout, orderBy }),
-    [view, layout, orderBy]
+    () => ({ view, layout, orderBy, sortDirection }),
+    [view, layout, orderBy, sortDirection]
   )
 
   const visibleStatuses = React.useMemo<readonly TaskStatus[]>(
     () => (view === "active" ? ACTIVE_STATUSES : STATUS_ORDER),
     [view]
-  )
-
-  const orderedTasksByStatus = React.useMemo(
-    () => applyOrderToGrouped(tasksByStatus, orderBy),
-    [tasksByStatus, orderBy]
   )
 
   const openCreateModal = React.useCallback(
@@ -182,10 +204,10 @@ export function TaskList() {
 
   const handleDragStart = React.useCallback(
     (event: DragStartEvent) => {
-      const task = findTaskById(Number(event.active.id), tasksByStatus)
+      const task = findTaskById(Number(event.active.id), orderedTasksByStatus)
       setActiveTask(task ?? null)
     },
-    [tasksByStatus]
+    [orderedTasksByStatus]
   )
 
   const onDragEnd = React.useCallback(
@@ -238,6 +260,7 @@ export function TaskList() {
         onViewChange={setView}
         onLayoutChange={setLayout}
         onOrderByChange={setOrderBy}
+        onSortDirectionChange={setSortDirection}
         onResetFilters={resetFilters}
         onCreateTask={() => openCreateModal(TOOLBAR_CREATE_DEFAULTS)}
       />
@@ -291,6 +314,8 @@ export function TaskList() {
               <TaskListView
                 visibleStatuses={visibleStatuses}
                 tasksByStatus={orderedTasksByStatus}
+                orderBy={orderBy}
+                activeDragStatus={activeDragStatus}
                 onPriorityChange={updateTaskPriority}
                 onStatusChange={updateTaskStatus}
                 onTaskClick={openEditModal}
@@ -300,6 +325,8 @@ export function TaskList() {
               <TaskBoardView
                 visibleStatuses={visibleStatuses}
                 tasksByStatus={orderedTasksByStatus}
+                orderBy={orderBy}
+                activeDragStatus={activeDragStatus}
                 onPriorityChange={updateTaskPriority}
                 onStatusChange={updateTaskStatus}
                 onTaskClick={openEditModal}

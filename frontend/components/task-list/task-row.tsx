@@ -3,9 +3,10 @@
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 
+import { TaskDueDate } from "@/components/task-list/task-due-date"
 import { TaskPriorityDropdown } from "@/components/task-list/task-priority-dropdown"
 import { TaskStatusDropdown } from "@/components/task-list/task-status-dropdown"
-import { formatDueDate, formatTaskId } from "@/lib/tasks/utils"
+import { formatTaskId } from "@/lib/tasks/utils"
 import type { Task, TaskUpdateHandlers } from "@/lib/tasks/types"
 import { cn } from "@/lib/utils"
 
@@ -73,9 +74,7 @@ export function TaskRow({
         {task.title}
       </button>
 
-      <span className="ml-auto shrink-0 text-xs text-muted-foreground">
-        {formatDueDate(task.dueDate)}
-      </span>
+      <TaskDueDate task={task} className="ml-auto shrink-0" />
     </div>
   )
 }

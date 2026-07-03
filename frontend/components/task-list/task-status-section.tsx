@@ -5,6 +5,7 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Add01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons"
 
+import { TaskOrderedDragBlocker } from "@/components/task-list/task-ordered-drag-blocker"
 import { TaskRow } from "@/components/task-list/task-row"
 import { TaskStatusIcon } from "@/components/task-list/task-status-icon"
 import {
@@ -13,13 +14,15 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { Button } from "@/components/ui/button"
-import { STATUS_CONFIG } from "@/lib/tasks/constants"
+import { isManualTaskOrder, STATUS_CONFIG, type TaskOrderBy } from "@/lib/tasks/constants"
 import type { Task, TaskStatus, TaskUpdateHandlers } from "@/lib/tasks/types"
 import { cn } from "@/lib/utils"
 
 type TaskStatusSectionProps = {
   status: TaskStatus
   tasks: Task[]
+  orderBy: TaskOrderBy
+  activeDragStatus: TaskStatus | null
   onTaskClick: (task: Task) => void
   onAddTask: (status: TaskStatus) => void
 } & TaskUpdateHandlers
@@ -27,6 +30,8 @@ type TaskStatusSectionProps = {
 export function TaskStatusSection({
   status,
   tasks,
+  orderBy,
+  activeDragStatus,
   onPriorityChange,
   onStatusChange,
   onTaskClick,
@@ -34,6 +39,8 @@ export function TaskStatusSection({
 }: TaskStatusSectionProps) {
   const config = STATUS_CONFIG[status]
   const taskIds = tasks.map((task) => task.id)
+  const showOrderedDragBlocker =
+    activeDragStatus === status && !isManualTaskOrder(orderBy)
 
   const { setNodeRef, isOver } = useDroppable({ id: status })
 
@@ -79,10 +86,14 @@ export function TaskStatusSection({
           ref={setNodeRef}
           data-over={isOver}
           className={cn(
-            "min-h-0 rounded-md transition-colors",
+            "relative min-h-0 rounded-md transition-colors",
             isOver && "bg-muted/30"
           )}
         >
+          <TaskOrderedDragBlocker
+            orderBy={orderBy}
+            visible={showOrderedDragBlocker}
+          />
           <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
             {tasks.length > 0 ? (
               tasks.map((task) => (
