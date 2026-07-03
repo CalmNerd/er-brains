@@ -25,10 +25,13 @@ import {
 } from "@/components/ui/select"
 import {
   DEFAULT_TASK_FILTERS,
+  isManualTaskOrder,
   TASK_LAYOUT_OPTIONS,
   TASK_ORDER_OPTIONS,
+  TASK_SORT_DIRECTION_OPTIONS,
   type TaskLayout,
   type TaskOrderBy,
+  type TaskSortDirection,
   type TaskView,
 } from "@/lib/tasks/constants"
 import { cn } from "@/lib/utils"
@@ -37,12 +40,14 @@ export type TaskFilters = {
   view: TaskView
   layout: TaskLayout
   orderBy: TaskOrderBy
+  sortDirection: TaskSortDirection
 }
 
 type TaskFilterMenuProps = {
   filters: TaskFilters
   onLayoutChange: (layout: TaskLayout) => void
   onOrderByChange: (orderBy: TaskOrderBy) => void
+  onSortDirectionChange: (sortDirection: TaskSortDirection) => void
   onReset: () => void
 }
 
@@ -60,12 +65,16 @@ export function TaskFilterMenu({
   filters,
   onLayoutChange,
   onOrderByChange,
+  onSortDirectionChange,
   onReset,
 }: TaskFilterMenuProps) {
   const isDirty =
     filters.view !== DEFAULT_TASK_FILTERS.view ||
     filters.layout !== DEFAULT_TASK_FILTERS.layout ||
-    filters.orderBy !== DEFAULT_TASK_FILTERS.orderBy
+    filters.orderBy !== DEFAULT_TASK_FILTERS.orderBy ||
+    filters.sortDirection !== DEFAULT_TASK_FILTERS.sortDirection
+
+  const isSortDirectionEnabled = !isManualTaskOrder(filters.orderBy)
 
   return (
     <DropdownMenu>
@@ -131,6 +140,39 @@ export function TaskFilterMenu({
               <SelectContent align="end">
                 <SelectGroup>
                   {TASK_ORDER_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-3 p-2">
+          <Label className="text-xs font-normal text-muted-foreground">
+            Sort by
+          </Label>
+          <div onPointerDown={stopMenuClose}>
+            <Select
+              value={filters.sortDirection}
+              onValueChange={(value) =>
+                onSortDirectionChange(value as TaskSortDirection)
+              }
+              items={TASK_SORT_DIRECTION_OPTIONS}
+              disabled={!isSortDirectionEnabled}
+            >
+              <SelectTrigger
+                size="sm"
+                className="w-[120px]"
+                disabled={!isSortDirectionEnabled}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent align="end">
+                <SelectGroup>
+                  {TASK_SORT_DIRECTION_OPTIONS.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>

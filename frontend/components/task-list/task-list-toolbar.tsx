@@ -5,7 +5,7 @@ import { Add01Icon } from "@hugeicons/core-free-icons"
 
 import { TaskFilterMenu, type TaskFilters } from "@/components/task-list/task-filter-menu"
 import { Button } from "@/components/ui/button"
-import type { TaskLayout, TaskOrderBy, TaskView } from "@/lib/tasks/constants"
+import type { TaskLayout, TaskOrderBy, TaskSortDirection, TaskView } from "@/lib/tasks/constants"
 import { cn } from "@/lib/utils"
 
 type TaskListToolbarProps = {
@@ -13,6 +13,7 @@ type TaskListToolbarProps = {
   onViewChange: (view: TaskView) => void
   onLayoutChange: (layout: TaskLayout) => void
   onOrderByChange: (orderBy: TaskOrderBy) => void
+  onSortDirectionChange: (sortDirection: TaskSortDirection) => void
   onResetFilters: () => void
   onCreateTask: () => void
 }
@@ -27,6 +28,7 @@ export function TaskListToolbar({
   onViewChange,
   onLayoutChange,
   onOrderByChange,
+  onSortDirectionChange,
   onResetFilters,
   onCreateTask,
 }: TaskListToolbarProps) {
@@ -65,6 +67,7 @@ export function TaskListToolbar({
           filters={filters}
           onLayoutChange={onLayoutChange}
           onOrderByChange={onOrderByChange}
+          onSortDirectionChange={onSortDirectionChange}
           onReset={onResetFilters}
         />
       </div>
