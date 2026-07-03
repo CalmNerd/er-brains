@@ -2,6 +2,8 @@
 
 A full-stack task management application with team workspaces, list and board views, drag-and-drop ordering, and Groq-powered AI task suggestions.
 
+**Live demo:** [er-brains.vercel.app](https://er-brains.vercel.app/)
+
 **Repository:** [github.com/CalmNerd/er-brains](https://github.com/CalmNerd/er-brains)
 
 ## Features
@@ -126,10 +128,12 @@ More detail in [frontend/README.md](./frontend/README.md) and [backend/README.md
 
 ## Deployment
 
-Suggested setup:
+**Live app:** [https://er-brains.vercel.app](https://er-brains.vercel.app/)
 
-- **Frontend** — Vercel (connect `frontend/` directory)
-- **Backend** — Render, Railway, or Fly.io (connect `backend/` directory)
+Stack in production:
+
+- **Frontend** — Vercel (`frontend/` directory)
+- **Backend** — Render (free tier; may sleep — use the wake control on the landing page)
 - **Database** — Neon PostgreSQL
 
 Backend environment variables for production:
@@ -156,3 +160,4 @@ On deploy, run `prisma db push` or `prisma migrate deploy` against your producti
 - **Rate limiting and AI cost controls** — Throttle `/api/ai/suggest` per user to prevent abuse
 - **Offline / error recovery** — Retry queues and clearer conflict handling for failed optimistic updates
 - **Accessibility audit** — Full keyboard navigation for board DnD and screen-reader labels on drag overlays
+- **SEO** — Richer metadata (Open Graph, Twitter cards), structured data, and per-route titles/descriptions for better discoverability and link previews

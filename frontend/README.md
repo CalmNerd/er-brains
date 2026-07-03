@@ -2,6 +2,8 @@
 
 Next.js 16 app with list and board task views, team navigation, drag-and-drop, and AI-assisted task creation.
 
+**Live demo:** [er-brains.vercel.app](https://er-brains.vercel.app/)
+
 **Repository:** [github.com/CalmNerd/er-brains](https://github.com/CalmNerd/er-brains)
 
 ## Tech Stack
