@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import React from 'react'
 import { cn } from '@/lib/utils'
-import Image from 'next/image'
+import { DoneAIIcon } from './ui/icons'
 
 // const menuItems = [
 //     { name: 'Features', href: '#features' },
@@ -35,70 +35,11 @@ export const HeroHeader = () => {
                                 href="/"
                                 aria-label="home"
                                 className="flex items-center space-x-2 py-4">
-                                    <Image src="/assets/erbrains-logo.png" alt="ER Brains" width={100} height={100} />
+                                <DoneAIIcon className='size-6' />
+                                <span className='text-2xl font-bold'>DoneAI</span>
+
                             </Link>
-
-                            {/* <button
-                                onClick={() => setMenuState(!menuState)}
-                                aria-label={menuState ? 'Close Menu' : 'Open Menu'}
-                                className="relative z-20 -m-2.5 -mr-4 block cursor-pointer p-2.5 lg:hidden">
-                                <Menu className="in-data-[state=active]:rotate-180 in-data-[state=active]:scale-0 in-data-[state=active]:opacity-0 m-auto size-6 duration-200" />
-                                <X className="in-data-[state=active]:rotate-0 in-data-[state=active]:scale-100 in-data-[state=active]:opacity-100 absolute inset-0 m-auto size-6 -rotate-180 scale-0 opacity-0 duration-200" />
-                            </button>
-
-                            <div className="m-auto hidden size-fit lg:block">
-                                <ul className="flex gap-1">
-                                    {menuItems.map((item) => (
-                                        <li key={item.name}>
-                                            <Button
-                                                render={<Link href={item.href} />}
-                                                variant="ghost"
-                                                size="sm"
-                                                className="text-base">
-                                                <span>{item.name}</span>
-                                            </Button>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div> */}
                         </div>
-
-                        {/* <div className="bg-background in-data-[state=active]:block lg:in-data-[state=active]:flex mb-6 hidden w-full flex-wrap items-center justify-end space-y-8 rounded-3xl border p-6 shadow-2xl shadow-zinc-300/20 md:flex-nowrap lg:m-0 lg:flex lg:w-fit lg:gap-6 lg:space-y-0 lg:border-transparent lg:bg-transparent lg:p-0 lg:shadow-none dark:shadow-none dark:lg:bg-transparent">
-                            <div className="lg:hidden">
-                                <ul className="space-y-6 text-base">
-                                    {menuItems.map((item) => (
-                                        <li key={item.name}>
-                                            <Link
-                                                href={item.href}
-                                                className="text-muted-foreground hover:text-accent-foreground block duration-150">
-                                                <span>{item.name}</span>
-                                            </Link>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                            <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
-                                <Button
-                                    render={<Link href="/login" />}
-                                    variant="ghost"
-                                    size="sm"
-                                    className={cn(isScrolled && 'lg:hidden')}>
-                                    <span>Login</span>
-                                </Button>
-                                <Button
-                                    render={<Link href="/signup" />}
-                                    size="sm"
-                                    className={cn(isScrolled && 'lg:hidden')}>
-                                    <span>Sign Up</span>
-                                </Button>
-                                <Button
-                                    render={<Link href="/signup" />}
-                                    size="sm"
-                                    className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
-                                    <span>Get Started</span>
-                                </Button>
-                            </div>
-                        </div> */}
                     </div>
                 </div>
             </nav>

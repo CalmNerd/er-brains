@@ -66,7 +66,7 @@ export function LoginForm() {
     <AuthLayout
       title="Organize work effortlessly."
       description="Sign in to manage tasks, track priorities, and collaborate with your team across boards and lists."
-      quote="ER Brains keeps our sprint board and backlog in one place. We ship faster because nothing gets lost."
+      quote="DoneAI keeps our sprint board and backlog in one place. We ship faster because nothing gets lost."
       quoteAuthor="product team lead"
     >
       <div className="mx-auto w-full max-w-sm space-y-6">

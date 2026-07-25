@@ -4,7 +4,7 @@ import { ArrowLeftIcon } from "@hugeicons/core-free-icons"
 
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import Image from "next/image"
+import { DoneAIIcon } from "../ui/icons"
 
 type AuthLayoutProps = {
   children: React.ReactNode
@@ -84,13 +84,14 @@ export function AuthLayout({
         </Link>
 
         <div className="flex items-center justify-center gap-1.5 px-8 pt-10 pb-6 text-lg font-medium lg:pt-12">
-          <Image src="/assets/erbrains-logo.png" alt="ER Brains" width={100} height={100} />
+          <DoneAIIcon className='size-6' />
+          <span className="text-lg font-medium">DoneAI</span>
         </div>
 
         <div className="flex flex-1 flex-col justify-center px-8">{children}</div>
 
         <p className="text-muted-foreground px-8 pb-8 text-center text-xs">
-          By continuing, you agree to ER Brains&apos;s{" "}
+          By continuing, you agree to DoneAI&apos;s{" "}
           <a
             className="hover:text-primary underline underline-offset-4"
             href="#"

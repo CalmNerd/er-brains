@@ -20,7 +20,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { logout } from "@/lib/auth/clear-app-state"
-import Image from "next/image"
+import { DoneAIIcon } from "./ui/icons"
 
 export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
   const router = useRouter()
@@ -54,7 +54,8 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:p-1.5!"
               render={<a href="/dashboard" />}
             >
-              <Image src="/assets/erbrains-logo.png" alt="ER Brains" width={100} height={100} className="mx-auto" />
+              <DoneAIIcon className='size-6' />
+              <span className="text-lg font-medium">DoneAI</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -91,7 +92,7 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
           user={{
             name: user?.name ?? "User",
             email: user?.email ?? "",
-            avatar: "/assets/logo.png",
+            avatar: "/assets/user.png",
           }}
           onLogout={handleLogout}
         />

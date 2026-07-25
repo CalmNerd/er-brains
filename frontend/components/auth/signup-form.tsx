@@ -68,7 +68,7 @@ export function SignupForm() {
     <AuthLayout
       title="Start shipping with clarity."
       description="Create your workspace, invite your team, and keep every task organized from day one."
-      quote="We moved our backlog into ER Brains in an afternoon and finally stopped juggling spreadsheets."
+      quote="We moved our backlog into DoneAI in an afternoon and finally stopped juggling spreadsheets."
       quoteAuthor="engineering manager"
     >
       <div className="mx-auto w-full max-w-sm space-y-6">
