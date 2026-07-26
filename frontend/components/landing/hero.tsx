@@ -46,14 +46,14 @@ export function LandingHero() {
                         className="size-3.5"
                       />
                     </Button>
-                    {/* <Button
+                    <Button
                       type="button"
                       size="lg"
                       variant="outline"
                       className="pl-5"
                       onClick={() =>
                         window.open(
-                          "https://youtu.be/Fy5Hk0adtsw",
+                          "https://youtu.be/zXBpUpaiY4k",
                           "_blank",
                           "noopener,noreferrer"
                         )
@@ -61,7 +61,7 @@ export function LandingHero() {
                     >
                       <HugeiconsIcon icon={Play} strokeWidth={2} className="size-3.5" />
                       <span className="text-nowrap">View demo</span>
-                    </Button> */}
+                    </Button>
                   </div>
 
                   <LogoCloud className="mt-10" />
