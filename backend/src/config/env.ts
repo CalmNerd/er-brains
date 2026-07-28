@@ -3,6 +3,16 @@ import { z } from "zod";
 
 config();
 
+const corsOriginsSchema = z
+  .string()
+  .default("http://localhost:3000")
+  .transform((value) =>
+    value
+      .split(",")
+      .map((origin) => origin.trim())
+      .filter(Boolean)
+  );
+
 const envSchema = z.object({
   DATABASE_URL: z.string().min(1),
   JWT_SECRET: z.string().min(1),
@@ -11,7 +21,7 @@ const envSchema = z.object({
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),
-  CORS_ORIGIN: z.string().default("http://localhost:3000"),
+  CORS_ORIGIN: corsOriginsSchema,
   JWT_EXPIRES_IN: z.string().default("7d"),
 });
 
