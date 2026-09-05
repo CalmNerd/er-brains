@@ -14,7 +14,7 @@ Node.js + Express API for authentication, team workspaces, task CRUD, and Groq-p
 | **PostgreSQL (Neon)** | Database | Relational model for users, teams, and tasks; serverless-friendly hosting |
 | **JWT + bcrypt** | Auth | Stateless tokens; passwords hashed before storage |
 | **Zod** | Validation | Request body and LLM output validation with clear error messages |
-| **Groq SDK** | AI provider | Fast inference via `llama-3.3-70b-versatile`; API key never exposed to clients |
+| **Groq SDK** | AI provider | Fast inference via `openai/gpt-oss-120b`; API key never exposed to clients |
 | **tsx** | Dev runner | TypeScript execution with watch mode during development |
 
 ## Architecture
@@ -169,7 +169,7 @@ The Groq provider:
 
 ## AI Tools and Resources
 
-- **Groq** — LLM inference (`llama-3.3-70b-versatile`)
+- **Groq** — LLM inference (`openai/gpt-oss-120b`)
 - **Cursor** — Used during development for scaffolding modules, validation schemas, and API design
 
 ## What I Would Improve With More Time

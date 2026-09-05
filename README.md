@@ -92,7 +92,7 @@ See [frontend/README.md](./frontend/README.md) and [backend/README.md](./backend
 
 ### AI in the product
 
-- **Groq** — `llama-3.3-70b-versatile` generates task title, description, and priority from rough user input
+- **Groq** — `openai/gpt-oss-120b` generates task title, description, and priority from rough user input
 - Suggestions are **stateless**: the LLM output is validated with Zod on the backend; tasks are only saved when the user explicitly submits the form
 
 ### Development tools
